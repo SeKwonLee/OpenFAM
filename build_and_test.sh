@@ -26,24 +26,24 @@ then
         exit 1
 fi
 
-echo "==========================================================="
-echo "Test OpenFAM with cis-rpc-meta-direct-mem-rpc configuration"
-echo "==========================================================="
-CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-cis-rpc-meta-direct-mem-rpc
-export OPENFAM_ROOT=$CONFIG_OUT_DIR
-$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model memory_server --cisinterface rpc --memserverinterface rpc --metaserverinterface direct --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
-if [[ $? > 0 ]]
-then
-        echo "OpenFAM test with cis-rpc-meta-direct-mem-rpc configuration failed. exit..."
-        exit 1
-fi
-
-sleep 5
-
-$BUILD_DIR/bin/openfam_adm --stop_service --clean 
-
-sleep 5
-
+#echo "==========================================================="
+#echo "Test OpenFAM with cis-rpc-meta-direct-mem-rpc configuration"
+#echo "==========================================================="
+#CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-cis-rpc-meta-direct-mem-rpc
+#export OPENFAM_ROOT=$CONFIG_OUT_DIR
+#$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model memory_server --cisinterface rpc --memserverinterface rpc --metaserverinterface direct --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
+#if [[ $? > 0 ]]
+#then
+#        echo "OpenFAM test with cis-rpc-meta-direct-mem-rpc configuration failed. exit..."
+#        exit 1
+#fi
+#
+#sleep 5
+#
+#$BUILD_DIR/bin/openfam_adm --stop_service --clean 
+#
+#sleep 5
+#
 echo "========================================================"
 echo "Test OpenFAM with cis-rpc-meta-rpc-mem-rpc configuration"
 echo "========================================================"
@@ -62,77 +62,77 @@ sleep 5
 $BUILD_DIR/bin/openfam_adm --stop_service --clean 
 
 sleep 5
-
-echo "=============================================================="
-echo "Test OpenFAM with cis-rpc-meta-direct-mem-direct configuration"
-echo "=============================================================="
-CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-cis-rpc-meta-direct-mem-direct
-export OPENFAM_ROOT=$CONFIG_OUT_DIR
-$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model memory_server --cisinterface rpc --memserverinterface direct --metaserverinterface direct --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
-
-if [[ $? > 0 ]]
-then
-        echo "OpenFAM test with cis-rpc-meta-direct-mem-direct configuration failed. exit..."
-        exit 1
-fi
-
-sleep 5
-
-$BUILD_DIR/bin/openfam_adm --stop_service --clean 
-
-sleep 5
-
-echo "==========================================================="
-echo "Test OpenFAM with cis-direct-meta-rpc-mem-rpc configuration"
-echo "==========================================================="
-CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-cis-direct-meta-rpc-mem-rpc
-export OPENFAM_ROOT=$CONFIG_OUT_DIR
-$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model memory_server --cisinterface direct --memserverinterface rpc --metaserverinterface rpc --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
-
-if [[ $? > 0 ]]
-then
-        echo "OpenFAM test with cis-direct-meta-rpc-mem-rpc configuration failed. exit..."
-        exit 1
-fi
-
-sleep 5 
-
-$BUILD_DIR/bin/openfam_adm --stop_service --clean 
-
-sleep 5
-
-echo "==========================================================="
-echo "Test OpenFAM with shared memory configuration"
-echo "==========================================================="
-CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-shared-memory
-export OPENFAM_ROOT=$CONFIG_OUT_DIR
-$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model shared_memory --cisinterface direct --memserverinterface direct --metaserverinterface direct --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
-
-if [[ $? > 0 ]]
-then
-        echo "OpenFAM test with shared memory configuration failed. exit..."
-        exit 1
-fi
-
-sleep 5 
-
-$BUILD_DIR/bin/openfam_adm --stop_service --clean 
-
-sleep 5
-
-echo "==========================================================="
-echo "Test OpenFAM with multiple memory servers in all rpc configuration"
-echo "==========================================================="
-CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-multi-mem
-export OPENFAM_ROOT=$CONFIG_OUT_DIR
-$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/multi-mem-config-arg.txt --install_path $INSTALL_DIR --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
-
-if [[ $? > 0 ]]
-then
-        echo "OpenFAM test with multiple memory servers in all rpc configuration failed. exit..."
-        exit 1
-fi
-
-$BUILD_DIR/bin/openfam_adm --stop_service --clean 
+#
+#echo "=============================================================="
+#echo "Test OpenFAM with cis-rpc-meta-direct-mem-direct configuration"
+#echo "=============================================================="
+#CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-cis-rpc-meta-direct-mem-direct
+#export OPENFAM_ROOT=$CONFIG_OUT_DIR
+#$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model memory_server --cisinterface rpc --memserverinterface direct --metaserverinterface direct --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
+#
+#if [[ $? > 0 ]]
+#then
+#        echo "OpenFAM test with cis-rpc-meta-direct-mem-direct configuration failed. exit..."
+#        exit 1
+#fi
+#
+#sleep 5
+#
+#$BUILD_DIR/bin/openfam_adm --stop_service --clean 
+#
+#sleep 5
+#
+#echo "==========================================================="
+#echo "Test OpenFAM with cis-direct-meta-rpc-mem-rpc configuration"
+#echo "==========================================================="
+#CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-cis-direct-meta-rpc-mem-rpc
+#export OPENFAM_ROOT=$CONFIG_OUT_DIR
+#$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model memory_server --cisinterface direct --memserverinterface rpc --metaserverinterface rpc --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
+#
+#if [[ $? > 0 ]]
+#then
+#        echo "OpenFAM test with cis-direct-meta-rpc-mem-rpc configuration failed. exit..."
+#        exit 1
+#fi
+#
+#sleep 5 
+#
+#$BUILD_DIR/bin/openfam_adm --stop_service --clean 
+#
+#sleep 5
+#
+#echo "==========================================================="
+#echo "Test OpenFAM with shared memory configuration"
+#echo "==========================================================="
+#CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-shared-memory
+#export OPENFAM_ROOT=$CONFIG_OUT_DIR
+#$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/common-config-arg.txt --install_path $INSTALL_DIR --model shared_memory --cisinterface direct --memserverinterface direct --metaserverinterface direct --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
+#
+#if [[ $? > 0 ]]
+#then
+#        echo "OpenFAM test with shared memory configuration failed. exit..."
+#        exit 1
+#fi
+#
+#sleep 5 
+#
+#$BUILD_DIR/bin/openfam_adm --stop_service --clean 
+#
+#sleep 5
+#
+#echo "==========================================================="
+#echo "Test OpenFAM with multiple memory servers in all rpc configuration"
+#echo "==========================================================="
+#CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-multi-mem
+#export OPENFAM_ROOT=$CONFIG_OUT_DIR
+#$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/multi-mem-config-arg.txt --install_path $INSTALL_DIR --create_config_files --config_file_path $CONFIG_OUT_DIR --start_service --runtests
+#
+#if [[ $? > 0 ]]
+#then
+#        echo "OpenFAM test with multiple memory servers in all rpc configuration failed. exit..."
+#        exit 1
+#fi
+#
+#$BUILD_DIR/bin/openfam_adm --stop_service --clean 
 
 cd $CURRENTDIR

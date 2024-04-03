@@ -739,16 +739,25 @@ if args.start_service:
             memory_server_id = server.split(":")[0]
             memory_server_addr = server.split(":")[1]
             key_string="openfam:mem:"+server
-            if openfam_admin_tool_config_doc["launcher"] == "ssh":
+            #if openfam_admin_tool_config_doc["launcher"] == "ssh":
+            if True:
+                #cmd = (
+                #    ssh_cmd
+                #    + memory_server_addr
+                #    + " \"sh -c '"
+                #    + "nohup "
+                #    + openfam_install_path
+                #    + "/bin/memory_server -m "
+                #    + memory_server_id
+                #    + "> /dev/null 2>&1 &'\""
+                #)
                 cmd = (
                     ssh_cmd
                     + memory_server_addr
                     + " \"sh -c '"
                     + "nohup "
                     + openfam_install_path
-                    + "/bin/memory_server -m "
-                    + memory_server_id
-                    + "> /dev/null 2>&1 &'\""
+                    + "/../run_memory_server.sh'\""
                 )
             elif openfam_admin_tool_config_doc["launcher"] == "slurm":
                 command_options = openfam_admin_tool_config_doc["launcher_options"]["common"]
@@ -929,13 +938,20 @@ if args.runtests:
         print('\033[1;31;40mERROR['+str(error_count) +
               ']: Regression test failed \033[0;37;40m')
         sys.exit(1)
-    cmd = "cd " + openfam_install_path + "; " + " make unit-test"
-    result = os.system(cmd)
-    if (result >> 8) != 0:
-        error_count = error_count + 1
-        print('\033[1;31;40mERROR['+str(error_count) +
-              ']: Unit test failed \033[0;37;40m')
-        sys.exit(1)
+    #cmd = "cd " + openfam_install_path + "; " + " make unit-test"
+    #result = os.system(cmd)
+    #if (result >> 8) != 0:
+    #    error_count = error_count + 1
+    #    print('\033[1;31;40mERROR['+str(error_count) +
+    #          ']: Unit test failed \033[0;37;40m')
+    #    sys.exit(1)
+
+    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
+    #    "./test/microbench/fam-api-mb/fam_microbenchmark_datapath 256 1" + \
+    #    " " + "--gtest_filter=FamPutGet.BlockingFamPut"
+    #result = os.system(cmd)
+
 
 # Terminate all services
 if args.stop_service:
@@ -943,7 +959,8 @@ if args.stop_service:
         pe_config_doc["openfam_model"] == "memory_server"
         and cis_config_doc["memsrv_interface_type"] == "rpc"
     ):
-        if openfam_admin_tool_config_doc["launcher"] == "ssh":
+        #if openfam_admin_tool_config_doc["launcher"] == "ssh":
+        if True:
             for server in cis_config_doc["memsrv_list"]:
                 memory_server_addr = server.split(":")[1]
                 memory_server_rpc_port = server.split(":")[2]

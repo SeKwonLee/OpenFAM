@@ -2,7 +2,7 @@
 #
 # Libfabric provider to be used by OpenFAM libfabric datapath operations; default is sockets.
 # Other options are psm2/verbs.
-provider: sockets
+provider: verbs
 
 # Number of threads used for delayed free.
 delayed_free_threads: 1 
