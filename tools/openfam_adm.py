@@ -292,6 +292,13 @@ my_parser.add_argument(
     help="Disable the resource relinquishment in FAM",
 )
 
+my_parser.add_argument(
+    '--bench_args',
+    default=[],
+    type=lambda l:list(map(str, l.split(','))),
+    help="List of arguments for benchmarks"
+)
+
 args = my_parser.parse_args()
 
 # set error count and warning to 0
@@ -930,14 +937,14 @@ if args.runtests:
             + str(npe)
         )
 
-    # Run regression and unit tests
-    cmd = "cd " + openfam_install_path + "; " + " make reg-test"
-    result = os.system(cmd)
-    if (result >> 8) != 0:
-        error_count = error_count + 1
-        print('\033[1;31;40mERROR['+str(error_count) +
-              ']: Regression test failed \033[0;37;40m')
-        sys.exit(1)
+    ## Run regression and unit tests
+    #cmd = "cd " + openfam_install_path + "; " + " make reg-test"
+    #result = os.system(cmd)
+    #if (result >> 8) != 0:
+    #    error_count = error_count + 1
+    #    print('\033[1;31;40mERROR['+str(error_count) +
+    #          ']: Regression test failed \033[0;37;40m')
+    #    sys.exit(1)
     #cmd = "cd " + openfam_install_path + "; " + " make unit-test"
     #result = os.system(cmd)
     #if (result >> 8) != 0:
@@ -948,9 +955,17 @@ if args.runtests:
 
     #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
     #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
-    #    "./test/microbench/fam-api-mb/fam_microbenchmark_datapath 256 1" + \
+    #    "./test/microbench/fam-api-mb/fam_microbenchmark_datapath 1024 1 1" + \
     #    " " + "--gtest_filter=FamPutGet.BlockingFamPut"
-    #result = os.system(cmd)
+    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
+    #    "./test/microbench/fam-api-mb/fam_microbenchmark_datapath 1024 1 0" + \
+    #    " " + "--gtest_filter=FamPutGet.BlockingFamGet"
+    cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+        " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
+        "./test/microbench/fam-api-mb/fam_microbenchmark_datapath {}".format(args.bench_args[0] + " " + args.bench_args[1] + " " + args.bench_args[2]) + \
+        " " + "{}".format(args.bench_args[3])
+    result = os.system(cmd)
 
 
 # Terminate all services

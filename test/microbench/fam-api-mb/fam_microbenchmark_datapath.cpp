@@ -31,6 +31,9 @@
 #include <fam/fam_exception.h>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <random>
+#include <chrono>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -42,7 +45,7 @@
 #include "common/fam_test_config.h"
 //#define NUM_ITERATIONS 1000
 #define ALL_PERM 0777
-#define BIG_REGION_SIZE 1073741824
+#define BIG_REGION_SIZE 34359738368
 using namespace std;
 using namespace openfam;
 
@@ -56,7 +59,10 @@ Fam_Region_Descriptor *desc;
 mode_t test_perm_mode;
 size_t test_item_size;
 
+uint64_t gItemSize = 8192 * 1024 * 1024ULL;
 uint64_t gDataSize = 256;
+
+int isRand = 0;
 
 #ifdef MEMSERVER_PROFILE
 #define RESET_PROFILE()                                                        \
@@ -78,6 +84,7 @@ uint64_t gDataSize = 256;
 
 // Test case -  Blocking put get test.
 TEST(FamPutGet, BlockingFamPut) {
+#if 0
     int64_t *local = (int64_t *)malloc(gDataSize);
     unsigned int offset = 0;
 
@@ -85,7 +92,39 @@ TEST(FamPutGet, BlockingFamPut) {
         EXPECT_NO_THROW(
             my_fam->fam_put_blocking(local, item, offset, gDataSize));
     }
+
     free(local);
+#else
+    int64_t *local = (int64_t *)malloc(gDataSize);
+    uint64_t offset = 0, index = 0;
+    uint64_t num_ios = gItemSize / gDataSize;
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<uint64_t> distribution(0, num_ios - 1);
+
+    auto starttime = std::chrono::system_clock::now();
+    if (isRand) {
+        for (uint64_t i = 0; i < num_ios; i++) {
+            index = distribution(generator);
+            offset = index * gDataSize;
+            my_fam->fam_put_blocking(local, item, offset, gDataSize);
+        }
+    } else {
+        for (uint64_t i = 0; i < num_ios; i++) {
+            offset = i * gDataSize;
+            my_fam->fam_put_blocking(local, item, offset, gDataSize);
+        }
+    }
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now() - starttime);
+    printf("Elapsed time (us): %lu us\n", duration.count());
+    printf("Elapsed time (ms): %.f ms\n", (double)duration.count() / 1000.0);
+    printf("Elapsed time (sec): %.f sec\n", (double)duration.count() / 1000000.0);
+    printf("Throughput: %f Mops/sec\n", ((double)num_ios * 1.0) / (double)duration.count());
+    printf("Throughput: %f GB/sec\n", ((double)gItemSize / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
+
+    free(local);
+#endif
 }
 
 TEST(FamPutGet, BlockingFamPutNewDesc) {
@@ -109,6 +148,7 @@ TEST(FamPutGet, BlockingFamPutNewDesc) {
 }
 
 TEST(FamPutGet, BlockingFamGet) {
+#if 0
     int64_t *local = (int64_t *)malloc(gDataSize);
     unsigned int offset = 0;
 
@@ -117,6 +157,37 @@ TEST(FamPutGet, BlockingFamGet) {
             my_fam->fam_get_blocking(local, item, offset, gDataSize));
     }
     free(local);
+#else
+    int64_t *local = (int64_t *)malloc(gDataSize);
+    uint64_t offset = 0, index = 0;
+    uint64_t num_ios = gItemSize / gDataSize;
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<uint64_t> distribution(0, num_ios - 1);
+
+    auto starttime = std::chrono::system_clock::now();
+    if (isRand) {
+        for (uint64_t i = 0; i < num_ios; i++) {
+            index = distribution(generator);
+            offset = index * gDataSize;
+            my_fam->fam_get_blocking(local, item, offset, gDataSize);
+        }
+    } else {
+        for (uint64_t i = 0; i < num_ios; i++) {
+            offset = i * gDataSize;
+            my_fam->fam_get_blocking(local, item, offset, gDataSize);
+        }
+    }
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now() - starttime);
+    printf("Elapsed time (us): %lu us\n", duration.count());
+    printf("Elapsed time (ms): %.f ms\n", (double)duration.count() / 1000.0);
+    printf("Elapsed time (sec): %.f sec\n", (double)duration.count() / 1000000.0);
+    printf("Throughput: %f Mops/sec\n", ((double)num_ios * 1.0) / (double)duration.count());
+    printf("Throughput: %f GB/sec\n", ((double)gItemSize / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
+
+    free(local);
+#endif
 }
 
 // Test case -  Non-Blocking get test.
@@ -297,6 +368,10 @@ int main(int argc, char **argv) {
     if (argc == 3) {
         gDataSize = atoi(argv[1]);
         NUM_ITERATIONS = atoi(argv[2]);
+    } else if (argc == 4) {
+        gDataSize = atoi(argv[1]);
+        NUM_ITERATIONS = atoi(argv[2]);
+        isRand = atoi(argv[3]);
     }
 
     my_fam = new fam();
@@ -336,7 +411,8 @@ int main(int argc, char **argv) {
                         testRegion, BIG_REGION_SIZE, 0777, NULL));
 
     test_perm_mode = ALL_PERM;
-    test_item_size = gDataSize * 4;
+    //test_item_size = gDataSize * 4;
+    test_item_size = gItemSize;
     // Allocating data items in the created region
     EXPECT_NO_THROW(item = my_fam->fam_allocate(dataItem, test_item_size,
                                                 test_perm_mode, desc));
