@@ -1127,7 +1127,8 @@ if args.clean:
                         openfam_admin_tool_config_doc["launcher_options"]["memserver"][server]
                 cmd = "srun --nodelist=" + addr + " " + command_options + " rm -rf " + path
             else:
-                cmd = "rm -rf " + path
+                cmd = ssh_cmd + addr + " \"sh -c 'rm -rf " + path + "'\""
+                #cmd = "rm -rf " + path
             os.system(cmd)
 
     if(cis_config_doc["metadata_interface_type"] == "rpc"):
