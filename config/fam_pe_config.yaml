@@ -5,7 +5,7 @@ FamThreadModel: single
 
 # Libfabric provider to be used by OpenFAM libfabric datapath operations; default is sockets. 
 # Other options: verbs for Infiniband provider, psm2 for Omnipath provider.
-provider: sockets
+provider: verbs
 
 # OpenFAM model to be used; default is memory_server, Other option is shared_memory.
 # For shared_memory model, FAM should be present in same node as PE.
@@ -21,7 +21,7 @@ client_interface_type: rpc
 
 # Device interface for communication for OpenFAM client.
 # Please note that this parameter is valid only for verbs provider
-#if_device: ib0 
+if_device: ibs1 
 
 # Address of Client Interface Service - It can be hostname (fully qualified domain name)/ipv4 address.
 # Applicable only if client_interface_type is rpc.
