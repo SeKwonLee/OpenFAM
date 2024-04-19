@@ -953,18 +953,10 @@ if args.runtests:
     #          ']: Unit test failed \033[0;37;40m')
     #    sys.exit(1)
 
-    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
-    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
-    #    "./test/microbench/fam-api-mb/fam_microbenchmark_datapath 1024 1 1" + \
-    #    " " + "--gtest_filter=FamPutGet.BlockingFamPut"
-    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
-    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
-    #    "./test/microbench/fam-api-mb/fam_microbenchmark_datapath 1024 1 0" + \
-    #    " " + "--gtest_filter=FamPutGet.BlockingFamGet"
     cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
         " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
-        "./test/microbench/fam-api-mb/fam_microbenchmark_datapath {}".format(args.bench_args[0] + " " + args.bench_args[1] + " " + args.bench_args[2]) + \
-        " " + "{}".format(args.bench_args[3])
+        "./test/microbench/fam-api-mb/fam_microbenchmark_datapath2 {}".format(args.bench_args[0] + \
+        " " + args.bench_args[1] + " " + args.bench_args[2]) + " " + "{}".format(args.bench_args[3])
     result = os.system(cmd)
 
 
