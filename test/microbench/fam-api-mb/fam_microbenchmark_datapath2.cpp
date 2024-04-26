@@ -455,6 +455,150 @@ TEST(FamPutGet, BlockingFamGetMultipleRegionDataItem) {
     free(threads);
 }
 
+// Test case 5 -  Blocking put test by multiple threads on a single region and multiple data items.
+TEST(FamPutGet, BlockingFamPutSingleRegionMultipleDataItem) {
+    uint64_t num_ios = gItemSize / gDataSize, i;
+    pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
+    int rc;
+
+    Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
+    Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
+
+    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+
+    std::string regionPrefix("region");
+    std::string itemPrefix("item");
+
+    Fam_Region_Attributes *regionAttributes = new Fam_Region_Attributes();
+    regionAttributes->permissionLevel = DATAITEM;
+
+    EXPECT_NO_THROW(desc = my_fam->fam_create_region((regionPrefix).c_str(), 
+                BIG_REGION_SIZE, 0777, regionAttributes));
+    EXPECT_NE((void *)NULL, desc);
+
+    for (i = 0; i < numThreads; i++) {
+        descs[i] = desc;
+        EXPECT_NO_THROW(items[i] = my_fam->fam_allocate((itemPrefix + std::to_string(i)).c_str(),
+                    gItemSize / numThreads, 0777, descs[i]));
+        EXPECT_NE((void *)NULL, items[i]);
+    }
+
+    // Warm-up
+    int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
+    memset(testBuf, 1, gItemSize / numThreads);
+    for (i = 0; i < numThreads; i++) {
+        my_fam->fam_put_blocking(testBuf, items[i], 0, gItemSize / numThreads);
+    }
+    free(testBuf);
+
+    auto starttime = std::chrono::system_clock::now();
+    for (i = 0; i < numThreads; i++) {
+        infos[i].item = items[i];
+        infos[i].tid = i;
+        if ((rc = pthread_create(&threads[i], NULL, 
+                        func_blocking_put_multiple_region_item, &infos[i]))) {
+            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+            exit(1);
+        }
+    }
+
+    for (i = 0; i < numThreads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now() - starttime);
+    printf("Elapsed time (us): %lu us\n", duration.count());
+    printf("Elapsed time (ms): %.f ms\n", (double)duration.count() / 1000.0);
+    printf("Elapsed time (sec): %.f sec\n", (double)duration.count() / 1000000.0);
+    printf("Throughput: %f Mops/sec\n", ((double)num_ios * 1.0) / (double)duration.count());
+    printf("Throughput: %f GB/sec\n", ((double)gItemSize / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
+
+    // Deallocating data items
+    for (i = 0; i < numThreads; i++) {
+        EXPECT_NO_THROW(my_fam->fam_deallocate(items[i]));
+    }
+    free(items);
+
+    // Destroying the region
+    EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
+    free(descs);
+
+    free(infos);
+    free(threads);
+}
+
+// Test case 6 -  Blocking get test by multiple threads on a single region and multiple data items.
+TEST(FamPutGet, BlockingFamGetSingleRegionMultipleDataItem) {
+    uint64_t num_ios = gItemSize / gDataSize, i;
+    pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
+    int rc;
+
+    Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
+    Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
+
+    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+
+    std::string regionPrefix("region");
+    std::string itemPrefix("item");
+
+    Fam_Region_Attributes *regionAttributes = new Fam_Region_Attributes();
+    regionAttributes->permissionLevel = DATAITEM;
+
+    EXPECT_NO_THROW(desc = my_fam->fam_create_region((regionPrefix).c_str(), 
+                BIG_REGION_SIZE, 0777, regionAttributes));
+    EXPECT_NE((void *)NULL, desc);
+
+    for (i = 0; i < numThreads; i++) {
+        descs[i] = desc;
+        EXPECT_NO_THROW(items[i] = my_fam->fam_allocate((itemPrefix + std::to_string(i)).c_str(),
+                    gItemSize / numThreads, 0777, descs[i]));
+        EXPECT_NE((void *)NULL, items[i]);
+    }
+
+    // Warm-up
+    int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
+    memset(testBuf, 1, gItemSize / numThreads);
+    for (i = 0; i < numThreads; i++) {
+        my_fam->fam_get_blocking(testBuf, items[i], 0, gItemSize / numThreads);
+    }
+    free(testBuf);
+
+    auto starttime = std::chrono::system_clock::now();
+    for (i = 0; i < numThreads; i++) {
+        infos[i].item = items[i];
+        infos[i].tid = i;
+        if ((rc = pthread_create(&threads[i], NULL, 
+                        func_blocking_get_multiple_region_item, &infos[i]))) {
+            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+            exit(1);
+        }
+    }
+
+    for (i = 0; i < numThreads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now() - starttime);
+    printf("Elapsed time (us): %lu us\n", duration.count());
+    printf("Elapsed time (ms): %.f ms\n", (double)duration.count() / 1000.0);
+    printf("Elapsed time (sec): %.f sec\n", (double)duration.count() / 1000000.0);
+    printf("Throughput: %f Mops/sec\n", ((double)num_ios * 1.0) / (double)duration.count());
+    printf("Throughput: %f GB/sec\n", ((double)gItemSize / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
+
+    // Deallocating data items
+    for (i = 0; i < numThreads; i++) {
+        EXPECT_NO_THROW(my_fam->fam_deallocate(items[i]));
+    }
+    free(items);
+
+    // Destroying the region
+    EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
+    free(descs);
+
+    free(infos);
+    free(threads);
+}
+
 int main(int argc, char **argv) {
     int ret;
     ::testing::InitGoogleTest(&argc, argv);
