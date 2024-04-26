@@ -15,4 +15,4 @@ cd $BUILD_DIR
 
 CONFIG_OUT_DIR=$BUILD_DIR/test/config_files/config-cis-rpc-meta-rpc-mem-rpc
 export OPENFAM_ROOT=$CONFIG_OUT_DIR
-numactl --physcpubind=0 --membind=0 bin/memory_server -m 0 > /dev/null 2>&1 &
+numactl --cpunodebind=0 --membind=0 bin/memory_server -m 0 > /dev/null 2>&1 &
