@@ -839,7 +839,8 @@ if args.start_service:
                 )
             else:
                 cmd = (
-                    openfam_install_path
+                    "numactl --cpunodebind=0 --membind=0 "
+                    + openfam_install_path
                     + "/bin/metadata_server -a "
                     + metadata_server_addr
                     + " -r "
@@ -889,7 +890,8 @@ if args.start_service:
             )
         else:
             cmd = (
-                openfam_install_path
+                "numactl --cpunodebind=0 --membind=0 "
+                + openfam_install_path
                 + "/bin/cis_server -a "
                 + cis_addr
                 + " -r "
@@ -955,8 +957,12 @@ if args.runtests:
 
     cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
         " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
-        "./test/microbench/fam-api-mb/fam_microbenchmark_datapath2 {}".format(args.bench_args[0] + \
+        "numactl --cpunodebind=0 --membind=0 ./test/microbench/fam-api-mb/fam_microbenchmark_datapath2 {}".format(args.bench_args[0] + \
         " " + args.bench_args[1] + " " + args.bench_args[2]) + " " + "{}".format(args.bench_args[3])
+    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
+    #    "./test/microbench/fam-api-mb/fam_microbenchmark_datapath2 {}".format(args.bench_args[0] + \
+    #    " " + args.bench_args[1] + " " + args.bench_args[2]) + " " + "{}".format(args.bench_args[3])
     result = os.system(cmd)
 
 

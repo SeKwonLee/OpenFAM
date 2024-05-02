@@ -214,10 +214,11 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     }
 
     // Warm-up
-    int64_t *testBuf = (int64_t *)malloc(gItemSize);
-    memset(testBuf, 1, gItemSize);
-    my_fam->fam_put_blocking(testBuf, item, 0, gItemSize);
-    free(testBuf);
+    //int64_t *testBuf = (int64_t *)malloc(gItemSize);
+    //memset(testBuf, 1, gItemSize);
+    //my_fam->fam_put_blocking(testBuf, item, 0, gItemSize);
+    //free(testBuf);
+    //my_fam->fam_barrier_all();
 
     auto starttime = std::chrono::system_clock::now();
     for (i = 0; i < numThreads; i++) {
@@ -278,10 +279,11 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     }
 
     // Warm-up
-    int64_t *testBuf = (int64_t *)malloc(gItemSize);
-    memset(testBuf, 1, gItemSize);
-    my_fam->fam_get_blocking(testBuf, item, 0, gItemSize);
-    free(testBuf);
+    //int64_t *testBuf = (int64_t *)malloc(gItemSize);
+    //memset(testBuf, 1, gItemSize);
+    //my_fam->fam_get_blocking(testBuf, item, 0, gItemSize);
+    //free(testBuf);
+    //my_fam->fam_barrier_all();
 
     auto starttime = std::chrono::system_clock::now();
     for (i = 0; i < numThreads; i++) {
@@ -341,12 +343,13 @@ TEST(FamPutGet, BlockingFamPutMultipleRegionDataItem) {
     }
 
     // Warm-up
-    int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
-    memset(testBuf, 1, gItemSize / numThreads);
-    for (i = 0; i < numThreads; i++) {
-        my_fam->fam_put_blocking(testBuf, items[i], 0, gItemSize / numThreads);
-    }
-    free(testBuf);
+    //int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
+    //memset(testBuf, 1, gItemSize / numThreads);
+    //for (i = 0; i < numThreads; i++) {
+    //    my_fam->fam_put_blocking(testBuf, items[i], 0, gItemSize / numThreads);
+    //}
+    //free(testBuf);
+    //my_fam->fam_barrier_all();
 
     auto starttime = std::chrono::system_clock::now();
     for (i = 0; i < numThreads; i++) {
@@ -410,12 +413,13 @@ TEST(FamPutGet, BlockingFamGetMultipleRegionDataItem) {
     }
 
     // Warm-up
-    int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
-    memset(testBuf, 1, gItemSize / numThreads);
-    for (i = 0; i < numThreads; i++) {
-        my_fam->fam_get_blocking(testBuf, items[i], 0, gItemSize / numThreads);
-    }
-    free(testBuf);
+    //int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
+    //memset(testBuf, 1, gItemSize / numThreads);
+    //for (i = 0; i < numThreads; i++) {
+    //    my_fam->fam_get_blocking(testBuf, items[i], 0, gItemSize / numThreads);
+    //}
+    //free(testBuf);
+    //my_fam->fam_barrier_all();
 
     auto starttime = std::chrono::system_clock::now();
     for (i = 0; i < numThreads; i++) {
@@ -470,7 +474,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionMultipleDataItem) {
     std::string itemPrefix("item");
 
     Fam_Region_Attributes *regionAttributes = new Fam_Region_Attributes();
-    regionAttributes->permissionLevel = DATAITEM;
+    regionAttributes->permissionLevel = REGION;
 
     EXPECT_NO_THROW(desc = my_fam->fam_create_region((regionPrefix).c_str(), 
                 BIG_REGION_SIZE, 0777, regionAttributes));
@@ -484,12 +488,13 @@ TEST(FamPutGet, BlockingFamPutSingleRegionMultipleDataItem) {
     }
 
     // Warm-up
-    int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
-    memset(testBuf, 1, gItemSize / numThreads);
-    for (i = 0; i < numThreads; i++) {
-        my_fam->fam_put_blocking(testBuf, items[i], 0, gItemSize / numThreads);
-    }
-    free(testBuf);
+    //int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
+    //memset(testBuf, 1, gItemSize / numThreads);
+    //for (i = 0; i < numThreads; i++) {
+    //    my_fam->fam_put_blocking(testBuf, items[i], 0, gItemSize / numThreads);
+    //}
+    //free(testBuf);
+    //my_fam->fam_barrier_all();
 
     auto starttime = std::chrono::system_clock::now();
     for (i = 0; i < numThreads; i++) {
@@ -542,7 +547,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionMultipleDataItem) {
     std::string itemPrefix("item");
 
     Fam_Region_Attributes *regionAttributes = new Fam_Region_Attributes();
-    regionAttributes->permissionLevel = DATAITEM;
+    regionAttributes->permissionLevel = REGION;
 
     EXPECT_NO_THROW(desc = my_fam->fam_create_region((regionPrefix).c_str(), 
                 BIG_REGION_SIZE, 0777, regionAttributes));
@@ -556,12 +561,13 @@ TEST(FamPutGet, BlockingFamGetSingleRegionMultipleDataItem) {
     }
 
     // Warm-up
-    int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
-    memset(testBuf, 1, gItemSize / numThreads);
-    for (i = 0; i < numThreads; i++) {
-        my_fam->fam_get_blocking(testBuf, items[i], 0, gItemSize / numThreads);
-    }
-    free(testBuf);
+    //int64_t *testBuf = (int64_t *)malloc(gItemSize / numThreads);
+    //memset(testBuf, 1, gItemSize / numThreads);
+    //for (i = 0; i < numThreads; i++) {
+    //    my_fam->fam_get_blocking(testBuf, items[i], 0, gItemSize / numThreads);
+    //}
+    //free(testBuf);
+    //my_fam->fam_barrier_all();
 
     auto starttime = std::chrono::system_clock::now();
     for (i = 0; i < numThreads; i++) {
