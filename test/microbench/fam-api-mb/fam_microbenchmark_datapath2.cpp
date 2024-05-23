@@ -36,6 +36,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+#include <assert.h>
+#include <sys/mman.h>
 
 #include "cis/fam_cis_client.h"
 #include "cis/fam_cis_direct.h"
@@ -62,11 +65,14 @@ uint64_t gItemSize = 8192 * 1024 * 1024ULL;
 uint64_t gDataSize = 256;
 
 int isRand = 0;
+double zipf = 0.0;
 uint64_t numThreads = 1;
 
 typedef struct {
     Fam_Descriptor *item;
     uint64_t tid;
+    uint64_t num_ops;
+    uint64_t *indexes;
 } ValueInfo;
 
 #ifdef MEMSERVER_PROFILE
@@ -87,28 +93,53 @@ typedef struct {
 #define GENERATE_PROFILE()
 #endif
 
+double get_base(unsigned N, double skew) {                                                                   
+    double base = 0;                                                                                         
+    for (unsigned k = 1; k <= N; k++) {
+        base += pow(k, -1 * skew);                                                                           
+    }                                                                                                        
+    return (1 / base);                                                                                       
+}
+
+int sample(int n, unsigned &seed, double base,
+        double *sum_probs) {
+    double z;           // Uniform random number (0 < z < 1)
+    int zipf_value = 0; // Computed exponential value to be returned
+    int low, high, mid; // Binary-search bounds
+
+    // Pull a uniform random number (0 < z < 1)
+    do {
+        z = rand_r(&seed) / static_cast<double>(RAND_MAX);
+    } while ((z == 0) || (z == 1));
+
+    // Map z to the value
+    low = 1, high = n;
+
+    do {
+        mid = (int)floor((low + high) / 2);
+        if (sum_probs[mid] >= z && sum_probs[mid - 1] < z) {
+            zipf_value = mid;
+            break;
+        } else if (sum_probs[mid] >= z) {
+            high = mid - 1;
+        } else {
+            low = mid + 1;
+        }
+    } while (low <= high);
+
+    // Assert that zipf_value is between 1 and N
+    assert((zipf_value >= 1) && (zipf_value <= n));
+
+    return zipf_value;
+}
+
 void *func_blocking_put_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
-    uint64_t offset = 0, index = 0;
-    uint64_t num_ios = gItemSize / gDataSize / numThreads;
-    
-    uint64_t start_idx = num_ios * it->tid;
-    uint64_t end_idx = start_idx + num_ios - 1;
+    uint64_t offset = 0;
 
-    std::default_random_engine generator;
-    std::uniform_int_distribution<uint64_t> distribution(start_idx, end_idx);
-
-    if (isRand) {
-        for (uint64_t i = 0; i < num_ios; i++) {
-            index = distribution(generator);
-            offset = index * gDataSize;
-            my_fam->fam_put_blocking(gLocalBuf, it->item, offset, gDataSize);
-        }
-    } else {
-        for (uint64_t i = start_idx; i <= end_idx; i++) {
-            offset = i * gDataSize;
-            my_fam->fam_put_blocking(gLocalBuf, it->item, offset, gDataSize);
-        }
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        offset = it->indexes[i] * gDataSize;
+        my_fam->fam_put_blocking(gLocalBuf, it->item, offset, gDataSize);
     }
 
     pthread_exit(NULL);
@@ -116,26 +147,11 @@ void *func_blocking_put_single_region_item(void *arg) {
 
 void *func_blocking_get_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
-    uint64_t offset = 0, index = 0;
-    uint64_t num_ios = gItemSize / gDataSize / numThreads;
+    uint64_t offset = 0;
 
-    uint64_t start_idx = num_ios * it->tid;
-    uint64_t end_idx = start_idx + num_ios - 1;
-
-    std::default_random_engine generator;
-    std::uniform_int_distribution<uint64_t> distribution(start_idx, end_idx);
-
-    if (isRand) {
-        for (uint64_t i = 0; i < num_ios; i++) {
-            index = distribution(generator);
-            offset = index * gDataSize;
-            my_fam->fam_get_blocking(gLocalBuf, it->item, offset, gDataSize);
-        }
-    } else {
-        for (uint64_t i = start_idx; i <= end_idx; i++) {
-            offset = i * gDataSize;
-            my_fam->fam_get_blocking(gLocalBuf, it->item, offset, gDataSize);
-        }
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        offset = it->indexes[i] * gDataSize;
+        my_fam->fam_put_blocking(gLocalBuf, it->item, offset, gDataSize);
     }
 
     pthread_exit(NULL);
@@ -191,7 +207,7 @@ void *func_blocking_get_multiple_region_item(void *arg) {
 
 // Test case 1 -  Blocking put test by multiple threads on same region and data item.
 TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
-    uint64_t num_ios = gItemSize / gDataSize, i;
+    uint64_t num_ios = gItemSize / gDataSize;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
     int rc;
 
@@ -209,7 +225,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     EXPECT_NO_THROW(item = my_fam->fam_allocate(itemPrefix.c_str(), gItemSize, 0777, desc));
     EXPECT_NE((void *)NULL, item);
 
-    for (i = 0; i < numThreads; i++) {
+    for (uint64_t i = 0; i < numThreads; i++) {
         items[i] = item;
     }
 
@@ -220,10 +236,55 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     //free(testBuf);
     //my_fam->fam_barrier_all();
 
-    auto starttime = std::chrono::system_clock::now();
-    for (i = 0; i < numThreads; i++) {
+    uint64_t num_indexes = num_ios;
+    double base = 0;
+    unsigned seed = 0;
+
+    double *sum_probs = (double *) calloc(1, sizeof(double) * num_indexes);
+
+    if (zipf > 0) {
+        base = get_base((unsigned)num_indexes, zipf);
+        sum_probs[0] = 0;
+
+        for (unsigned i = 1; i <= num_indexes; i++) {
+            sum_probs[i] = sum_probs[i - 1] + base / pow((double)i, zipf);
+        }
+    }
+
+    for (uint64_t i = 0; i < numThreads; i++) {
         infos[i].item = items[i];
         infos[i].tid = i;
+        infos[i].num_ops = num_indexes / numThreads;
+        infos[i].indexes = (uint64_t *) calloc(1, sizeof(uint64_t) * infos[i].num_ops);
+
+        if (isRand) {
+            if (zipf > 0) {
+                seed = (unsigned)time(NULL);
+                seed += (unsigned)infos[i].tid;
+                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                    infos[i].indexes[j] = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
+                    infos[i].indexes[j] -= 1;
+                }
+            } else {
+                uint64_t start_idx = infos[i].num_ops * infos[i].tid;
+                uint64_t end_idx = start_idx + infos[i].num_ops - 1;
+
+                std::default_random_engine generator;
+                std::uniform_int_distribution<uint64_t> distribution(start_idx, end_idx);
+                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                    infos[i].indexes[j] = distribution(generator);
+                }
+            }
+        } else {
+            uint64_t start_idx = infos[i].num_ops * infos[i].tid;
+            for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                infos[i].indexes[j] = start_idx + j;
+            }
+        }
+    }
+
+    auto starttime = std::chrono::system_clock::now();
+    for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
                         func_blocking_put_single_region_item, &infos[i]))) {
             fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
@@ -231,7 +292,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
         }
     }
 
-    for (i = 0; i < numThreads; i++) {
+    for (uint64_t i = 0; i < numThreads; i++) {
         pthread_join(threads[i], NULL);
     }
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -250,13 +311,17 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
     free(descs);
 
+    free(sum_probs);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        free(infos[i].indexes);
+    }
     free(infos);
     free(threads);
 }
 
 // Test case 2 -  Blocking get test by multiple threads on same region and data item.
 TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
-    uint64_t num_ios = gItemSize / gDataSize, i;
+    uint64_t num_ios = gItemSize / gDataSize;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
     int rc;
 
@@ -274,7 +339,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     EXPECT_NO_THROW(item = my_fam->fam_allocate(itemPrefix.c_str(), gItemSize, 0777, desc));
     EXPECT_NE((void *)NULL, item);
 
-    for (i = 0; i < numThreads; i++) {
+    for (uint64_t i = 0; i < numThreads; i++) {
         items[i] = item;
     }
 
@@ -285,10 +350,55 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     //free(testBuf);
     //my_fam->fam_barrier_all();
 
-    auto starttime = std::chrono::system_clock::now();
-    for (i = 0; i < numThreads; i++) {
+    uint64_t num_indexes = num_ios;
+    double base = 0;
+    unsigned seed = 0;
+
+    double *sum_probs = (double *) calloc(1, sizeof(double) * num_indexes);
+
+    if (zipf > 0) {
+        base = get_base((unsigned)num_indexes, zipf);
+        sum_probs[0] = 0;
+
+        for (unsigned i = 1; i <= num_indexes; i++) {
+            sum_probs[i] = sum_probs[i - 1] + base / pow((double)i, zipf);
+        }
+    }
+
+    for (uint64_t i = 0; i < numThreads; i++) {
         infos[i].item = items[i];
         infos[i].tid = i;
+        infos[i].num_ops = num_indexes / numThreads;
+        infos[i].indexes = (uint64_t *) calloc(1, sizeof(uint64_t) * infos[i].num_ops);
+
+        if (isRand) {
+            if (zipf > 0) {
+                seed = (unsigned)time(NULL);
+                seed += (unsigned)infos[i].tid;
+                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                    infos[i].indexes[j] = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
+                    infos[i].indexes[j] -= 1;
+                }
+            } else {
+                uint64_t start_idx = infos[i].num_ops * infos[i].tid;
+                uint64_t end_idx = start_idx + infos[i].num_ops - 1;
+
+                std::default_random_engine generator;
+                std::uniform_int_distribution<uint64_t> distribution(start_idx, end_idx);
+                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                    infos[i].indexes[j] = distribution(generator);
+                }
+            }
+        } else {
+            uint64_t start_idx = infos[i].num_ops * infos[i].tid;
+            for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                infos[i].indexes[j] = start_idx + j;
+            }
+        }
+    }
+
+    auto starttime = std::chrono::system_clock::now();
+    for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
                         func_blocking_get_single_region_item, &infos[i]))) {
             fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
@@ -296,7 +406,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         }
     }
 
-    for (i = 0; i < numThreads; i++) {
+    for (uint64_t i = 0; i < numThreads; i++) {
         pthread_join(threads[i], NULL);
     }
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -315,6 +425,10 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
     free(descs);
 
+    free(sum_probs);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        free(infos[i].indexes);
+    }
     free(infos);
     free(threads);
 }
@@ -609,14 +723,16 @@ int main(int argc, char **argv) {
     int ret;
     ::testing::InitGoogleTest(&argc, argv);
 
-    if (argc == 4) {
+    if (argc == 5) {
         gDataSize = atoi(argv[1]);
         isRand = atoi(argv[2]);
-        numThreads = atoi(argv[3]);
+        zipf = std::stod(argv[3]);
+        numThreads = atoi(argv[4]);
     }
 
     std::cout << "gDataSize = " << gDataSize << std::endl;
     std::cout << "isRand = " << isRand << std::endl;
+    std::cout << "zipf = " << zipf << std::endl;
     std::cout << "numThreads = " << numThreads << std::endl;
 
     my_fam = new fam();
