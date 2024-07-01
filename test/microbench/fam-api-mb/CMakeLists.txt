@@ -21,7 +21,7 @@
  #
 function (add_fam_test file_name)
     add_executable(${file_name} ${file_name}.cpp)
-    target_link_libraries(${file_name} openfam gtest)
+    target_link_libraries(${file_name} openfam gtest numa)
     add_test(NAME ${file_name} COMMAND ${TEST_RUNTIME_BIN} ${TEST_RUNTIME_OPTS} ${CMAKE_CURRENT_BINARY_DIR}/${file_name})
 endfunction()
 

@@ -32,6 +32,8 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <random>
+#include <algorithm>
+#include <ctime>
 #include <chrono>
 
 #include <stdio.h>
@@ -39,6 +41,7 @@
 #include <math.h>
 #include <assert.h>
 #include <sys/mman.h>
+#include <numa.h>
 
 #include "cis/fam_cis_client.h"
 #include "cis/fam_cis_direct.h"
@@ -68,11 +71,31 @@ int isRand = 0;
 double zipf = 0.0;
 uint64_t numThreads = 1;
 
+#define LOCAL_BUFFER_SIZE   2*1024*1024UL   // 2MB
+
+#ifdef ENABLE_LOCAL_CACHE
+#include "cache.hpp"
+#include "lru_cache_policy.hpp"
+
+void *gCacheBuf = NULL;
+
+template <typename Key, typename Value>
+using lru_cache_t = typename caches::fixed_sized_cache<Key, Value, caches::LRUCachePolicy>;
+double cache_ratio = 0.0;
+uint64_t cache_page_size = 4096;
+uint64_t num_cache_hit = 0;
+uint64_t num_cache_miss = 0;
+#endif
+
 typedef struct {
     Fam_Descriptor *item;
     uint64_t tid;
     uint64_t num_ops;
     uint64_t *indexes;
+#ifdef ENABLE_LOCAL_CACHE
+    lru_cache_t<uint64_t, void *> *cache;
+    void *cache_buf;
+#endif
 } ValueInfo;
 
 #ifdef MEMSERVER_PROFILE
@@ -151,11 +174,321 @@ void *func_blocking_get_single_region_item(void *arg) {
 
     for (uint64_t i = 0; i < it->num_ops; i++) {
         offset = it->indexes[i] * gDataSize;
-        my_fam->fam_put_blocking(gLocalBuf, it->item, offset, gDataSize);
+        my_fam->fam_get_blocking(gLocalBuf, it->item, offset, gDataSize);
     }
 
     pthread_exit(NULL);
 }
+
+#ifdef ENABLE_LOCAL_CACHE
+uint64_t offset_to_start_page_index(uint64_t byte_offset) {
+    return (uint64_t)(byte_offset / cache_page_size);
+}
+
+uint64_t offset_to_end_page_index(uint64_t byte_offset) {
+    if (byte_offset % cache_page_size == 0) {
+        return (uint64_t)(byte_offset / cache_page_size) - 1;
+    } else {
+        return (uint64_t)(byte_offset / cache_page_size);
+    }
+}
+
+uint64_t page_index_to_page_offset(uint64_t page_index) {
+    return (page_index * cache_page_size);
+}
+
+uint64_t page_index_to_page_local_offset(uint64_t byte_offset, uint64_t page_index) {
+    return (byte_offset - (page_index * cache_page_size));
+}
+
+void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
+    ValueInfo *it = (ValueInfo *)arg;
+    uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
+             start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
+
+    // Generate random indexes
+    std::srand(unsigned(std::time(0)));
+    std::vector<uint64_t> indexes;
+    indexes.reserve(it->num_ops);
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        indexes[i] = i;
+    }
+    std::random_shuffle(indexes.begin(), indexes.end());
+
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        byte_index = indexes[i];
+
+        start_byte_offset = byte_index * gDataSize;
+        end_byte_offset = start_byte_offset + gDataSize;
+
+        start_page_index = offset_to_start_page_index(start_byte_offset);
+        end_page_index = offset_to_end_page_index(end_byte_offset);
+
+        start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
+
+        uint64_t size_to_read = gDataSize, read_size = 0;
+        for (uint64_t index = start_page_index; index <= end_page_index; index++) {
+            const auto cache_value = it->cache->TryGet(index);
+            if (cache_value.second == true) {
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                                + start_page_local_offset), read_size);
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                            *cache_value.first.get(), read_size);
+                }
+            } else {
+                my_fam->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                        it->item, index * cache_page_size, cache_page_size);
+                it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    memcpy(gLocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
+                                + start_page_local_offset), read_size);
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                            (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
+                }
+            }
+
+            size_to_read -= read_size;
+        }
+    }
+
+    pthread_exit(NULL);
+}
+
+void *func_blocking_cache_get_single_region_item(void *arg) {
+    ValueInfo *it = (ValueInfo *)arg;
+    uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
+             start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
+
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        byte_index = it->indexes[i];
+
+        start_byte_offset = byte_index * gDataSize;
+        end_byte_offset = start_byte_offset + gDataSize;
+
+        start_page_index = offset_to_start_page_index(start_byte_offset);
+        end_page_index = offset_to_end_page_index(end_byte_offset);
+
+        start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
+
+        uint64_t size_to_read = gDataSize, read_size = 0;
+        for (uint64_t index = start_page_index; index <= end_page_index; index++) {
+#if 0
+            const auto cache_value = it->cache->TryGet(index);
+            if (cache_value.second == true) {
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                                + start_page_local_offset), read_size);
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                            *cache_value.first.get(), read_size);
+                }
+                num_cache_hit++;
+            } else {
+                my_fam->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                        it->item, index * cache_page_size, cache_page_size);
+                it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    memcpy(gLocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
+                                + start_page_local_offset), read_size);
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                            (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
+                }
+                num_cache_miss++;
+            }
+#else
+            if (index == start_page_index) {
+                read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                    (cache_page_size - start_page_local_offset) : gDataSize;
+                memcpy(gLocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
+                            + start_page_local_offset), read_size);
+            } else {
+                read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                        (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
+            }
+#endif
+
+            size_to_read -= read_size;
+        }
+    }
+
+    pthread_exit(NULL);
+}
+
+typedef struct PostProcessInfo {
+    uint64_t index;
+    void *src;
+    void *dest;
+    uint64_t read_size;
+} PostProcessInfo;
+
+void *func_non_blocking_cache_get_single_region_item_warmup(void *arg) {
+    ValueInfo *it = (ValueInfo *)arg;
+    uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
+             start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
+    std::vector<PostProcessInfo> PostProcessInfoArray;
+    if (gDataSize < cache_page_size) {
+        PostProcessInfoArray.reserve(1);
+    } else {
+        PostProcessInfoArray.reserve((size_t)(gDataSize/cache_page_size));
+    }
+
+    // Generate random indexes
+    std::srand(unsigned(std::time(0)));
+    std::vector<uint64_t> indexes;
+    indexes.reserve(it->num_ops);
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        indexes[i] = i;
+    }
+    std::random_shuffle(indexes.begin(), indexes.end());
+
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        byte_index = indexes[i];
+
+        start_byte_offset = byte_index * gDataSize;
+        end_byte_offset = start_byte_offset + gDataSize;
+
+        start_page_index = offset_to_start_page_index(start_byte_offset);
+        end_page_index = offset_to_end_page_index(end_byte_offset);
+
+        start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
+
+        uint64_t size_to_read = gDataSize, read_size = 0;
+        for (uint64_t index = start_page_index; index <= end_page_index; index++) {
+            const auto cache_value = it->cache->TryGet(index);
+            if (cache_value.second == true) {
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                                + start_page_local_offset), read_size);
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                            *cache_value.first.get(), read_size);
+                }
+            } else {
+                PostProcessInfo ppi;
+                ppi.index = index;
+                ppi.src = (void *)((uint64_t)it->cache_buf + (index * cache_page_size));
+                my_fam->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                        it->item, index * cache_page_size, cache_page_size);
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    ppi.dest = gLocalBuf;
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    ppi.dest = (void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read));
+                }
+                ppi.read_size = read_size;
+                PostProcessInfoArray.push_back(ppi);
+            }
+
+            size_to_read -= read_size;
+        }
+
+        if (PostProcessInfoArray.size() > 0) {
+            my_fam->fam_quiet();
+            for (auto & info : PostProcessInfoArray) {
+                it->cache->Put(info.index, info.src);
+                memcpy(info.dest, info.src, info.read_size);
+            }
+            PostProcessInfoArray.clear();
+        }
+    }
+
+    pthread_exit(NULL);
+}
+
+void *func_non_blocking_cache_get_single_region_item(void *arg) {
+    ValueInfo *it = (ValueInfo *)arg;
+    uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
+             start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
+    std::vector<PostProcessInfo> PostProcessInfoArray;
+    if (gDataSize < cache_page_size) {
+        PostProcessInfoArray.reserve(1);
+    } else {
+        PostProcessInfoArray.reserve((size_t)(gDataSize/cache_page_size));
+    }
+
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        byte_index = it->indexes[i];
+
+        start_byte_offset = byte_index * gDataSize;
+        end_byte_offset = start_byte_offset + gDataSize;
+
+        start_page_index = offset_to_start_page_index(start_byte_offset);
+        end_page_index = offset_to_end_page_index(end_byte_offset);
+
+        start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
+
+        uint64_t size_to_read = gDataSize, read_size = 0;
+        for (uint64_t index = start_page_index; index <= end_page_index; index++) {
+            const auto cache_value = it->cache->TryGet(index);
+            if (cache_value.second == true) {
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                                + start_page_local_offset), read_size);
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                            *cache_value.first.get(), read_size);
+                }
+                num_cache_hit++;
+            } else {
+                PostProcessInfo ppi;
+                ppi.index = index;
+                ppi.src = (void *)((uint64_t)it->cache_buf + (index * cache_page_size));
+                my_fam->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                        it->item, index * cache_page_size, cache_page_size);
+                if (index == start_page_index) {
+                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                        (cache_page_size - start_page_local_offset) : gDataSize;
+                    ppi.dest = gLocalBuf;
+                } else {
+                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    ppi.dest = (void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read));
+                }
+                ppi.read_size = read_size;
+                PostProcessInfoArray.push_back(ppi);
+                num_cache_miss++;
+            }
+
+            size_to_read -= read_size;
+        }
+
+        if (PostProcessInfoArray.size() > 0) {
+            my_fam->fam_quiet();
+            for (auto & info : PostProcessInfoArray) {
+                it->cache->Put(info.index, info.src);
+                memcpy(info.dest, info.src, info.read_size);
+            }
+            PostProcessInfoArray.clear();
+        }
+    }
+
+    pthread_exit(NULL);
+}
+#endif
 
 void *func_blocking_put_multiple_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
@@ -205,7 +538,7 @@ void *func_blocking_get_multiple_region_item(void *arg) {
     pthread_exit(NULL);
 }
 
-// Test case 1 -  Blocking put test by multiple threads on same region and data item.
+// Test case -  Blocking put test by multiple threads on same region and data item.
 TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     uint64_t num_ios = gItemSize / gDataSize;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
@@ -319,7 +652,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     free(threads);
 }
 
-// Test case 2 -  Blocking get test by multiple threads on same region and data item.
+// Test case -  Blocking get test by multiple threads on same region and data item.
 TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     uint64_t num_ios = gItemSize / gDataSize;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
@@ -329,6 +662,178 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
     ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+
+#ifdef ENABLE_LOCAL_CACHE
+    size_t cache_size = (size_t)((double)(((double)gItemSize / (double)cache_page_size) 
+                / (double)numThreads) * cache_ratio);
+    lru_cache_t<uint64_t, void *> **caches = (lru_cache_t<uint64_t, void *> **)malloc(sizeof(lru_cache_t<uint64_t, void *> *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        caches[i] = new lru_cache_t<uint64_t, void *>(cache_size);
+        infos[i].cache = caches[i];
+        infos[i].cache_buf = gCacheBuf;
+    }
+#endif
+
+    std::string regionPrefix("region");
+    std::string itemPrefix("item");
+    EXPECT_NO_THROW(desc = my_fam->fam_create_region(regionPrefix.c_str(),
+                BIG_REGION_SIZE, 0777, NULL));
+    EXPECT_NE((void *)NULL, desc);
+
+    EXPECT_NO_THROW(item = my_fam->fam_allocate(itemPrefix.c_str(), gItemSize, 0777, desc));
+    EXPECT_NE((void *)NULL, item);
+
+    for (uint64_t i = 0; i < numThreads; i++) {
+        items[i] = item;
+    }
+
+    // Warm-up
+    //int64_t *testBuf = (int64_t *)malloc(gItemSize);
+    //memset(testBuf, 1, gItemSize);
+    //my_fam->fam_get_blocking(testBuf, item, 0, gItemSize);
+    //free(testBuf);
+    //my_fam->fam_barrier_all();
+
+    uint64_t num_indexes = num_ios;
+    double base = 0;
+    unsigned seed = 0;
+
+    double *sum_probs = (double *) calloc(1, sizeof(double) * num_indexes);
+
+    if (zipf > 0) {
+        base = get_base((unsigned)num_indexes, zipf);
+        sum_probs[0] = 0;
+
+        seed = (unsigned)time(NULL);
+
+        for (unsigned i = 1; i <= num_indexes; i++) {
+            sum_probs[i] = sum_probs[i - 1] + base / pow((double)i, zipf);
+        }
+    }
+
+    for (uint64_t i = 0; i < numThreads; i++) {
+        infos[i].item = items[i];
+        infos[i].tid = i;
+        infos[i].num_ops = num_indexes / numThreads;
+        infos[i].indexes = (uint64_t *) calloc(1, sizeof(uint64_t) * infos[i].num_ops);
+
+        if (isRand) {
+            if (zipf > 0) {
+                //seed = (unsigned)time(NULL);
+                //seed += (unsigned)infos[i].tid;
+                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                    infos[i].indexes[j] = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
+                    infos[i].indexes[j] -= 1;
+                }
+            } else {
+                uint64_t start_idx = infos[i].num_ops * infos[i].tid;
+                uint64_t end_idx = start_idx + infos[i].num_ops - 1;
+
+                std::default_random_engine generator;
+                std::uniform_int_distribution<uint64_t> distribution(start_idx, end_idx);
+                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                    infos[i].indexes[j] = distribution(generator);
+                }
+            }
+        } else {
+            uint64_t start_idx = infos[i].num_ops * infos[i].tid;
+            for (uint64_t j = 0; j < infos[i].num_ops; j++) {
+                infos[i].indexes[j] = start_idx + j;
+            }
+        }
+    }
+
+//#ifdef ENABLE_LOCAL_CACHE
+//    for (uint64_t i = 0; i < numThreads; i++) {
+//        if ((rc = pthread_create(&threads[i], NULL, 
+//                        func_blocking_cache_get_single_region_item_warmup, &infos[i]))) {
+//            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+//            exit(1);
+//        }
+//    }
+//
+//    for (uint64_t i = 0; i < numThreads; i++) {
+//        pthread_join(threads[i], NULL);
+//    }
+//#endif
+
+    auto starttime = std::chrono::system_clock::now();
+#ifdef ENABLE_LOCAL_CACHE
+    for (uint64_t i = 0; i < numThreads; i++) {
+        if ((rc = pthread_create(&threads[i], NULL, 
+                        func_blocking_cache_get_single_region_item, &infos[i]))) {
+            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+            exit(1);
+        }
+    }
+#else
+    for (uint64_t i = 0; i < numThreads; i++) {
+        if ((rc = pthread_create(&threads[i], NULL, 
+                        func_blocking_get_single_region_item, &infos[i]))) {
+            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+            exit(1);
+        }
+    }
+#endif
+
+    for (uint64_t i = 0; i < numThreads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now() - starttime);
+    printf("Elapsed time (us): %lu us\n", duration.count());
+    printf("Elapsed time (ms): %.f ms\n", (double)duration.count() / 1000.0);
+    printf("Elapsed time (sec): %.f sec\n", (double)duration.count() / 1000000.0);
+    printf("Throughput: %f Mops/sec\n", ((double)num_ios * 1.0) / (double)duration.count());
+    printf("Throughput: %f GB/sec\n", ((double)gItemSize / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
+#ifdef ENABLE_LOCAL_CACHE
+    printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)num_ios) * 100.0);
+    printf("Cache hit count = %lu\n", num_cache_hit);
+    printf("Cache miss count = %lu\n", num_cache_miss);
+#endif
+
+    // Deallocating data items
+    EXPECT_NO_THROW(my_fam->fam_deallocate(item));
+    free(items);
+
+    // Destroying the region
+    EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
+    free(descs);
+
+    free(sum_probs);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        free(infos[i].indexes);
+#ifdef ENABLE_LOCAL_CACHE
+        delete infos[i].cache;
+#endif
+    }
+#ifdef ENABLE_LOCAL_CACHE
+    free(caches);
+#endif
+    free(infos);
+    free(threads);
+}
+
+// Test case -  NonBlocking get test by multiple threads on same region and data item.
+TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
+    uint64_t num_ios = gItemSize / gDataSize;
+    pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
+    int rc;
+
+    Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
+    Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
+
+    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+
+#ifdef ENABLE_LOCAL_CACHE
+    size_t cache_size = (size_t)((double)(((double)gItemSize / (double)cache_page_size) / (double)numThreads) * cache_ratio);
+    lru_cache_t<uint64_t, void *> **caches = (lru_cache_t<uint64_t, void *> **)malloc(sizeof(lru_cache_t<uint64_t, void *> *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        caches[i] = new lru_cache_t<uint64_t, void *>(cache_size);
+        infos[i].cache = caches[i];
+        infos[i].cache_buf = gCacheBuf;
+    }
+#endif
 
     std::string regionPrefix("region");
     std::string itemPrefix("item");
@@ -397,7 +902,30 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         }
     }
 
+#ifdef ENABLE_LOCAL_CACHE
+    for (uint64_t i = 0; i < numThreads; i++) {
+        if ((rc = pthread_create(&threads[i], NULL, 
+                        func_non_blocking_cache_get_single_region_item_warmup, &infos[i]))) {
+            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+            exit(1);
+        }
+    }
+
+    for (uint64_t i = 0; i < numThreads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+#endif
+
     auto starttime = std::chrono::system_clock::now();
+#ifdef ENABLE_LOCAL_CACHE
+    for (uint64_t i = 0; i < numThreads; i++) {
+        if ((rc = pthread_create(&threads[i], NULL, 
+                        func_non_blocking_cache_get_single_region_item, &infos[i]))) {
+            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+            exit(1);
+        }
+    }
+#else
     for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
                         func_blocking_get_single_region_item, &infos[i]))) {
@@ -405,6 +933,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
             exit(1);
         }
     }
+#endif
 
     for (uint64_t i = 0; i < numThreads; i++) {
         pthread_join(threads[i], NULL);
@@ -416,6 +945,11 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     printf("Elapsed time (sec): %.f sec\n", (double)duration.count() / 1000000.0);
     printf("Throughput: %f Mops/sec\n", ((double)num_ios * 1.0) / (double)duration.count());
     printf("Throughput: %f GB/sec\n", ((double)gItemSize / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
+#ifdef ENABLE_LOCAL_CACHE
+    printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)num_ios) * 100.0);
+    printf("Cache hit count = %lu\n", num_cache_hit);
+    printf("Cache miss count = %lu\n", num_cache_miss);
+#endif
 
     // Deallocating data items
     EXPECT_NO_THROW(my_fam->fam_deallocate(item));
@@ -428,12 +962,19 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     free(sum_probs);
     for (uint64_t i = 0; i < numThreads; i++) {
         free(infos[i].indexes);
+#ifdef ENABLE_LOCAL_CACHE
+        delete infos[i].cache;
+#endif
     }
+#ifdef ENABLE_LOCAL_CACHE
+    free(caches);
+#endif
     free(infos);
     free(threads);
 }
 
-// Test case 3 -  Blocking put test by multiple threads on multiple regions and data items.
+
+// Test case -  Blocking put test by multiple threads on multiple regions and data items.
 TEST(FamPutGet, BlockingFamPutMultipleRegionDataItem) {
     uint64_t num_ios = gItemSize / gDataSize, i;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
@@ -503,7 +1044,7 @@ TEST(FamPutGet, BlockingFamPutMultipleRegionDataItem) {
     free(threads);
 }
 
-// Test case 4 -  Blocking get test by multiple threads on multiple regions and data items.
+// Test case -  Blocking get test by multiple threads on multiple regions and data items.
 TEST(FamPutGet, BlockingFamGetMultipleRegionDataItem) {
     uint64_t num_ios = gItemSize / gDataSize, i;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
@@ -573,7 +1114,7 @@ TEST(FamPutGet, BlockingFamGetMultipleRegionDataItem) {
     free(threads);
 }
 
-// Test case 5 -  Blocking put test by multiple threads on a single region and multiple data items.
+// Test case -  Blocking put test by multiple threads on a single region and multiple data items.
 TEST(FamPutGet, BlockingFamPutSingleRegionMultipleDataItem) {
     uint64_t num_ios = gItemSize / gDataSize, i;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
@@ -646,7 +1187,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionMultipleDataItem) {
     free(threads);
 }
 
-// Test case 6 -  Blocking get test by multiple threads on a single region and multiple data items.
+// Test case -  Blocking get test by multiple threads on a single region and multiple data items.
 TEST(FamPutGet, BlockingFamGetSingleRegionMultipleDataItem) {
     uint64_t num_ios = gItemSize / gDataSize, i;
     pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
@@ -723,25 +1264,75 @@ int main(int argc, char **argv) {
     int ret;
     ::testing::InitGoogleTest(&argc, argv);
 
+#ifdef ENABLE_LOCAL_CACHE
+    if (argc == 7) {
+        gDataSize = atoi(argv[1]);
+        isRand = atoi(argv[2]);
+        zipf = std::stod(argv[3]);
+        numThreads = atoi(argv[4]);
+        cache_ratio = std::stod(argv[5]);
+        cache_page_size = std::atoi(argv[6]);
+        if (cache_page_size == 0) {
+            cache_page_size = gDataSize;
+        }
+    }
+#else
     if (argc == 5) {
         gDataSize = atoi(argv[1]);
         isRand = atoi(argv[2]);
         zipf = std::stod(argv[3]);
         numThreads = atoi(argv[4]);
     }
+#endif
 
     std::cout << "gDataSize = " << gDataSize << std::endl;
     std::cout << "isRand = " << isRand << std::endl;
     std::cout << "zipf = " << zipf << std::endl;
     std::cout << "numThreads = " << numThreads << std::endl;
+#ifdef ENABLE_LOCAL_CACHE
+    std::cout << "cache_ratio = " << cache_ratio << std::endl;
+    std::cout << "cache_page_size = " << cache_page_size << std::endl;
+#endif
 
     my_fam = new fam();
 
     init_fam_options(&fam_opts);
 
+#ifdef ENABLE_LOCAL_CACHE
+    gLocalBuf = (int64_t *)malloc(LOCAL_BUFFER_SIZE);
+    //gLocalBuf = (int64_t *)numa_alloc_onnode(LOCAL_BUFFER_SIZE, 1);
+    memset(gLocalBuf, 0, LOCAL_BUFFER_SIZE);
+#if 1
+    gCacheBuf = malloc(gItemSize);
+    //gCacheBuf = numa_alloc_onnode(gItemSize, 0);
+    memset(gCacheBuf, 0, gItemSize);
+#else
+    int fd = open("/mnt/hugetlbfs/gCacheBuf", O_CREAT | O_RDWR, 0755);
+    if (fd < 0) {
+        perror("open");
+        return 1;
+    }
+
+    if (ftruncate(fd, gItemSize) == -1) {
+        perror("ftruncate");
+        close(fd);
+        return 1;
+    }
+
+    gCacheBuf = mmap(NULL, gItemSize, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_HUGETLB | MAP_POPULATE, fd, 0);
+    if (gCacheBuf == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+#endif
+    fam_opts.local_buf_addr = gCacheBuf;
+    fam_opts.local_buf_size = gItemSize;
+#else
     gLocalBuf = (int64_t *)malloc(gDataSize);
     fam_opts.local_buf_addr = gLocalBuf;
     fam_opts.local_buf_size = gDataSize;
+#endif
 
     fam_opts.famThreadModel = strdup("FAM_THREAD_MULTIPLE");
 
@@ -754,5 +1345,16 @@ int main(int argc, char **argv) {
     EXPECT_NO_THROW(my_fam->fam_finalize("default"));
     cout << "Finalize done : " << ret << endl;
     delete my_fam;
+#ifdef ENABLE_LOCAL_CACHE
+    free(gLocalBuf);
+#if 1
+    free(gCacheBuf);
+#else
+    munmap(gCacheBuf, gItemSize);
+    close(fd);
+#endif
+#else
+    free(gLocalBuf);
+#endif
     return ret;
 }

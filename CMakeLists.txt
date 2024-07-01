@@ -89,6 +89,13 @@ if(ENABLE_RESOURCE_RELEASE_ITEM_PERM)
 	message(STATUS "Enabling resource relinquishment for region with DATAITEM permission")
 	add_definitions(-DENABLE_RESOURCE_RELEASE_ITEM_PERM)
 endif()
+
+if(ENABLE_LOCAL_CACHE)
+    message(STATUS "Enabling mok local cache implementation")
+    add_definitions(-DENABLE_LOCAL_CACHE)
+    include_directories(/home/leesek/projects/caches/include)
+endif()
+
 message(STATUS "====================")
 
 #
