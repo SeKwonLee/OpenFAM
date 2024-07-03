@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    uint64_t total_memory_size = std::stoul(std::string(argv[1])) * 1024UL;
+    uint64_t total_memory_size = std::stoul(std::string(argv[1])) * 1024UL * 1024UL;
     uint64_t access_size = std::stoul(std::string(argv[2]));     // in bytes
     int isRand = atoi(argv[3]);
     double zipf = std::stod(argv[4]);
