@@ -695,6 +695,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     //my_fam->fam_barrier_all();
 
     uint64_t num_indexes = num_ios;
+    std::vector<uint64_t> uniform_random_indexes;
     double base = 0;
     unsigned seed = 0;
 
@@ -709,6 +710,13 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         for (unsigned i = 1; i <= num_indexes; i++) {
             sum_probs[i] = sum_probs[i - 1] + base / pow((double)i, zipf);
         }
+    } else {
+        // Generate random indexes
+        std::srand(unsigned(std::time(0)));
+        for (uint64_t i = 0; i < num_indexes; i++) {
+            uniform_random_indexes.push_back(i);
+        }
+        std::random_shuffle(uniform_random_indexes.begin(), uniform_random_indexes.end());
     }
 
     for (uint64_t i = 0; i < numThreads; i++) {
@@ -719,23 +727,19 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
 
         if (isRand) {
             if (zipf > 0) {
-                //seed = (unsigned)time(NULL);
-                //seed += (unsigned)infos[i].tid;
                 for (uint64_t j = 0; j < infos[i].num_ops; j++) {
                     infos[i].indexes[j] = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
                     infos[i].indexes[j] -= 1;
                 }
             } else {
-                uint64_t start_idx = infos[i].num_ops * infos[i].tid;
-                uint64_t end_idx = start_idx + infos[i].num_ops - 1;
-
-                std::default_random_engine generator;
-                std::uniform_int_distribution<uint64_t> distribution(start_idx, end_idx);
+                // Uniform random
                 for (uint64_t j = 0; j < infos[i].num_ops; j++) {
-                    infos[i].indexes[j] = distribution(generator);
+                    infos[i].indexes[j] = uniform_random_indexes.back();
+                    uniform_random_indexes.pop_back();
                 }
             }
         } else {
+            // Sequential
             uint64_t start_idx = infos[i].num_ops * infos[i].tid;
             for (uint64_t j = 0; j < infos[i].num_ops; j++) {
                 infos[i].indexes[j] = start_idx + j;
