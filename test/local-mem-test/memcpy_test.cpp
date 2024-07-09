@@ -94,7 +94,21 @@ void pinThreadToNode(int nodeId) {
     }
 
     // Set the affinity for the current thread
-    pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+    int result = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+    if (result != 0) {
+	    fprintf(stderr, "Error setting thread affinity: %d\n", result);
+    }
+}
+
+void pinThreadToCore(int core_id) {
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(core_id, &cpuset);
+
+	int result = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+	if (result != 0) {
+		fprintf(stderr, "Error setting thread affinity: %d\n", result);
+	}
 }
 
 int main(int argc, char **argv) {
@@ -185,7 +199,8 @@ int main(int argc, char **argv) {
     }
 
     auto memcpy_bench_func = [&](int tid) {
-        pinThreadToNode(0);
+        //pinThreadToNode(0);
+	pinThreadToCore(tid);
         uint64_t index = 0;
         for (uint64_t i = 0; i < infos[tid].num_ops; i++) {
             index = infos[tid].indexes[i];
