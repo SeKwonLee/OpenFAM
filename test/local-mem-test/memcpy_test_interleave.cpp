@@ -16,6 +16,11 @@
 #define CACHE_LINE_SIZE     64
 #define LARGEST_BUF_SIZE    2*1024*1024UL
 
+enum {
+    INTERLEAVED = 0,
+    NORM_MALLOC = 1
+};
+
 static inline void mfence() {                                                                                
     asm volatile("sfence":::"memory");                                                                       
 }                                                                                                            
@@ -111,9 +116,33 @@ void pinThreadToCore(int core_id) {
 	}
 }
 
+void* allocate_interleaved_memory(size_t size, uint32_t num_threads) {
+    uint32_t num_interleaved = 4;
+    uint32_t num_numa_nodes = 4;
+
+    if (num_threads < num_numa_nodes) {
+        num_interleaved = num_threads;
+    }
+
+    struct bitmask *nodemask = numa_allocate_nodemask();
+    for (uint32_t i = 0; i < num_interleaved; i++) {
+        numa_bitmask_setbit(nodemask, i);
+    }
+
+    void* memory = numa_alloc_interleaved_subset(size, nodemask);
+    if (memory == NULL) {
+        fprintf(stderr, "Failed to allocate interleaved memory.\n");
+        numa_free_nodemask(nodemask);
+        exit(1);
+    }
+
+    numa_free_nodemask(nodemask);
+    return memory;
+}
+
 int main(int argc, char **argv) {
     if (argc != 7) {
-        printf("Usage: ./test <total memory size (MB)> <access size (Bytes)> <isRand: 0 or 1> <zipf: 0 - Uniform> <num threads> <numa_alloc: 0 or 1>\n");
+        printf("Usage: ./test <total memory size (MB)> <access size (Bytes)> <isRand: 0 or 1> <zipf: 0 - Uniform> <num threads> <allocation_type: 0: interleaved alloc or 1: using normal malloc>\n");
         return 0;
     }
 
@@ -122,20 +151,23 @@ int main(int argc, char **argv) {
     int isRand = atoi(argv[3]);
     double zipf = std::stod(argv[4]);
     uint64_t num_threads = std::stoul(std::string(argv[5]));
-    int do_numa_alloc = atoi(argv[6]);
+    int alloc_type = atoi(argv[6]);     // 0: interleaved alloc, 1: using malloc
 
     void *dest_buf = NULL;
     void *src_buf = NULL;
-    if (do_numa_alloc) {
-        dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE, 0);
+    if (alloc_type == INTERLEAVED) {
+        dest_buf = allocate_interleaved_memory(LARGEST_BUF_SIZE, num_threads);
         memset(dest_buf, 0, LARGEST_BUF_SIZE);
-        src_buf = numa_alloc_onnode(total_memory_size, 1);
+        src_buf = allocate_interleaved_memory(total_memory_size, num_threads);
+        memset(src_buf, 1, total_memory_size);
+    } else if (alloc_type == NORM_MALLOC) {
+        dest_buf = malloc(LARGEST_BUF_SIZE);
+        memset(dest_buf, 0, LARGEST_BUF_SIZE);
+        src_buf = malloc(total_memory_size);
         memset(src_buf, 1, total_memory_size);
     } else {
-        dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE, 0);
-        memset(dest_buf, 0, LARGEST_BUF_SIZE);
-        src_buf = numa_alloc_onnode(total_memory_size, 0);
-        memset(src_buf, 1, total_memory_size);
+        printf("Unknown allocation type = %d\n", alloc_type);
+        return -1;
     }
 
     clflush((char *)dest_buf, LARGEST_BUF_SIZE, true, true);
@@ -199,8 +231,8 @@ int main(int argc, char **argv) {
     }
 
     auto memcpy_bench_func = [&](int tid) {
-        //pinThreadToNode(0);
-	pinThreadToCore(tid);
+        int core_id = (16 * (tid % 4)) + (tid / 4);     // Interleave four numa nodes
+	    pinThreadToCore(core_id);
         uint64_t index = 0;
         for (uint64_t i = 0; i < infos[tid].num_ops; i++) {
             index = infos[tid].indexes[i];
@@ -222,8 +254,14 @@ int main(int argc, char **argv) {
             std::chrono::system_clock::now() - starttime);
     printf("Throughput: %f GB/sec\n", ((double)total_memory_size / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
 
-    numa_free(dest_buf, LARGEST_BUF_SIZE);
-    numa_free(src_buf, total_memory_size);
+    if (alloc_type == INTERLEAVED) {
+        numa_free(dest_buf, LARGEST_BUF_SIZE);
+        numa_free(src_buf, total_memory_size);
+    } else {
+        free(dest_buf);
+        free(src_buf);
+    }
+
     free(sum_probs);
 
     for (uint64_t i = 0; i < num_threads; i++) {
