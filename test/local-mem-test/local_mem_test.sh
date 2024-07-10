@@ -10,7 +10,7 @@ do
         ./memcpy_test 8192 ${access_size} 1 0.99 ${numThreads} 0 &>> log-single-numa-${pattern}.txt
         #numactl --cpunodebind=0 ./memcpy_test 8192 ${access_size} 1 0.99 ${numThreads} 0 &>> log-${pattern}.txt
     done
-    printf "\n\n" &>> log-${pattern}.txt
+    printf "\n\n" &>> log-single-numa-${pattern}.txt
 done
 
 pattern="uniform"
@@ -21,7 +21,7 @@ do
         ./memcpy_test 8192 ${access_size} 1 0 ${numThreads} 0 &>> log-single-numa-${pattern}.txt
         #numactl --cpunodebind=0 ./memcpy_test 8192 ${access_size} 1 0 ${numThreads} 0 &>> log-${pattern}.txt
     done
-    printf "\n\n" &>> log-${pattern}.txt
+    printf "\n\n" &>> log-single-numa-${pattern}.txt
 done
 
 
@@ -32,7 +32,7 @@ do
     do
         ./memcpy_test_interleave 8192 ${access_size} 1 0.99 ${numThreads} 0 &>> log-multi-numa-cpu-mem-interleave-${pattern}.txt
     done
-    printf "\n\n" &>> log-${pattern}.txt
+    printf "\n\n" &>> log-multi-numa-cpu-mem-interleave-${pattern}.txt
 done
 
 pattern="uniform"
@@ -42,7 +42,7 @@ do
     do
         ./memcpy_test_interleave 8192 ${access_size} 1 0 ${numThreads} 0 &>> log-multi-numa-cpu-mem-interleave-${pattern}.txt
     done
-    printf "\n\n" &>> log-${pattern}.txt
+    printf "\n\n" &>> log-multi-numa-cpu-mem-interleave-${pattern}.txt
 done
 
 
@@ -53,7 +53,7 @@ do
     do
         ./memcpy_test_interleave 8192 ${access_size} 1 0.99 ${numThreads} 1 &>> log-multi-numa-cpu-interleave-${pattern}.txt
     done
-    printf "\n\n" &>> log-${pattern}.txt
+    printf "\n\n" &>> log-multi-numa-cpu-interleave-${pattern}.txt
 done
 
 pattern="uniform"
@@ -63,5 +63,5 @@ do
     do
         ./memcpy_test_interleave 8192 ${access_size} 1 0 ${numThreads} 1 &>> log-multi-numa-cpu-interleave-${pattern}.txt
     done
-    printf "\n\n" &>> log-${pattern}.txt
+    printf "\n\n" &>> log-multi-numa-cpu-interleave-${pattern}.txt
 done
