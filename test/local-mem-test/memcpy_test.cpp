@@ -127,18 +127,18 @@ int main(int argc, char **argv) {
     void *dest_buf = NULL;
     void *src_buf = NULL;
     if (do_numa_alloc) {
-        dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE, 0);
-        memset(dest_buf, 0, LARGEST_BUF_SIZE);
+        dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE * num_threads, 0);
+        memset(dest_buf, 2, LARGEST_BUF_SIZE * num_threads);
         src_buf = numa_alloc_onnode(total_memory_size, 1);
         memset(src_buf, 1, total_memory_size);
     } else {
-        dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE, 0);
-        memset(dest_buf, 0, LARGEST_BUF_SIZE);
+        dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE * num_threads, 0);
+        memset(dest_buf, 2, LARGEST_BUF_SIZE * num_threads);
         src_buf = numa_alloc_onnode(total_memory_size, 0);
         memset(src_buf, 1, total_memory_size);
     }
 
-    clflush((char *)dest_buf, LARGEST_BUF_SIZE, true, true);
+    clflush((char *)dest_buf, LARGEST_BUF_SIZE * num_threads, true, true);
     clflush((char *)src_buf, total_memory_size, true, true);
 
     uint64_t num_ios = total_memory_size / access_size;
@@ -200,11 +200,11 @@ int main(int argc, char **argv) {
 
     auto memcpy_bench_func = [&](int tid) {
         //pinThreadToNode(0);
-	pinThreadToCore(tid);
+	    pinThreadToCore(tid);
         uint64_t index = 0;
         for (uint64_t i = 0; i < infos[tid].num_ops; i++) {
             index = infos[tid].indexes[i];
-            memcpy(dest_buf, (char *)((uint64_t)src_buf + (index * access_size)), access_size);
+            memcpy((char *)((uint64_t)dest_buf + (LARGEST_BUF_SIZE * (uint64_t)tid)), (char *)((uint64_t)src_buf + (index * access_size)), access_size);
         }
     };
 
@@ -222,7 +222,7 @@ int main(int argc, char **argv) {
             std::chrono::system_clock::now() - starttime);
     printf("Throughput: %f GB/sec\n", ((double)total_memory_size / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
 
-    numa_free(dest_buf, LARGEST_BUF_SIZE);
+    numa_free(dest_buf, LARGEST_BUF_SIZE * num_threads);
     numa_free(src_buf, total_memory_size);
     free(sum_probs);
 
