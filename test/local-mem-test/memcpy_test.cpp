@@ -7,6 +7,8 @@
 #include <math.h>
 #include <assert.h>
 #include <unistd.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 #include <chrono>
 #include <random>
@@ -112,7 +114,7 @@ void pinThreadToCore(int core_id) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 7) {
+    if (argc < 8) {
         printf("Usage: ./test <total memory size (MB)> <access size (Bytes)> <isRand: 0 or 1> <zipf: 0 - Uniform> <num threads> <numa_alloc: 0 or 1>\n");
         return 0;
     }
@@ -123,19 +125,70 @@ int main(int argc, char **argv) {
     double zipf = std::stod(argv[4]);
     uint64_t num_threads = std::stoul(std::string(argv[5]));
     int do_numa_alloc = atoi(argv[6]);
+    int enable_huge_page = atoi(argv[7]);
+    std::string path_to_hugetlbfs(argv[8]);
 
+    int src_fd = 0, dest_fd = 0;
     void *dest_buf = NULL;
     void *src_buf = NULL;
-    if (do_numa_alloc) {
+
+    if (enable_huge_page) {
+#if 1
         dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE * num_threads, 0);
         memset(dest_buf, 2, LARGEST_BUF_SIZE * num_threads);
-        src_buf = numa_alloc_onnode(total_memory_size, 1);
+#else
+        dest_fd = open((path_to_hugetlbfs + std::string("destBuf")).c_str(), O_CREAT | O_RDWR, 0755);
+        if (dest_fd < 0) {
+            perror("open");
+            return 1;
+        }
+
+        if (ftruncate(dest_fd, LARGEST_BUF_SIZE * num_threads) == -1) {
+            perror("ftruncate");
+            close(dest_fd);
+            return 1;
+        }
+
+        dest_buf = mmap(NULL, LARGEST_BUF_SIZE * num_threads, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_HUGETLB | MAP_POPULATE, dest_fd, 0);
+        if (dest_buf == MAP_FAILED) {
+            perror("mmap");
+            close(dest_fd);
+            return 1;
+        }
+        memset(dest_buf, 2, LARGEST_BUF_SIZE * num_threads);
+#endif
+
+        src_fd = open((path_to_hugetlbfs + std::string("srcBuf")).c_str(), O_CREAT | O_RDWR, 0755);
+        if (src_fd < 0) {
+            perror("open");
+            return 1;
+        }
+
+        if (ftruncate(src_fd, total_memory_size) == -1) {
+            perror("ftruncate");
+            close(src_fd);
+            return 1;
+        }
+
+        src_buf = mmap(NULL, total_memory_size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_HUGETLB | MAP_POPULATE, src_fd, 0);
+        if (src_buf == MAP_FAILED) {
+            perror("mmap");
+            close(src_fd);
+            return 1;
+        }
         memset(src_buf, 1, total_memory_size);
     } else {
-        dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE * num_threads, 0);
-        memset(dest_buf, 2, LARGEST_BUF_SIZE * num_threads);
-        src_buf = numa_alloc_onnode(total_memory_size, 0);
-        memset(src_buf, 1, total_memory_size);
+        if (do_numa_alloc) {
+            dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE * num_threads, 0);
+            memset(dest_buf, 2, LARGEST_BUF_SIZE * num_threads);
+            src_buf = numa_alloc_onnode(total_memory_size, 1);
+            memset(src_buf, 1, total_memory_size);
+        } else {
+            dest_buf = numa_alloc_onnode(LARGEST_BUF_SIZE * num_threads, 0);
+            memset(dest_buf, 2, LARGEST_BUF_SIZE * num_threads);
+            src_buf = numa_alloc_onnode(total_memory_size, 0);
+            memset(src_buf, 1, total_memory_size);
+        }
     }
 
     clflush((char *)dest_buf, LARGEST_BUF_SIZE * num_threads, true, true);
@@ -222,8 +275,17 @@ int main(int argc, char **argv) {
             std::chrono::system_clock::now() - starttime);
     printf("Throughput: %f GB/sec\n", ((double)total_memory_size / (1024 * 1024 * 1024)) / ((double)duration.count() / 1000000.0));
 
-    numa_free(dest_buf, LARGEST_BUF_SIZE * num_threads);
-    numa_free(src_buf, total_memory_size);
+    if (enable_huge_page) {
+        numa_free(dest_buf, LARGEST_BUF_SIZE * num_threads);
+        //munmap(dest_buf, LARGEST_BUF_SIZE * num_threads);
+        //close(dest_fd);
+        munmap(src_buf, total_memory_size);
+        close(src_fd);
+    } else {
+        numa_free(dest_buf, LARGEST_BUF_SIZE * num_threads);
+        numa_free(src_buf, total_memory_size);
+    }
+
     free(sum_probs);
 
     for (uint64_t i = 0; i < num_threads; i++) {
