@@ -10,7 +10,7 @@ do
         ./memcpy_test 8192 ${access_size} 1 0.99 ${numThreads} 0 &>> log-${pattern}.txt
         #numactl --cpunodebind=0 ./memcpy_test 8192 ${access_size} 1 0.99 ${numThreads} 0 &>> log-${pattern}.txt
     done
-    printf "\n\n" &>> log-single-numa-${pattern}.txt
+    printf "\n\n" &>> log-${pattern}.txt
 done
 
 pattern="uniform"
@@ -21,5 +21,5 @@ do
         ./memcpy_test 8192 ${access_size} 1 0 ${numThreads} 0 &>> log-${pattern}.txt
         #numactl --cpunodebind=0 ./memcpy_test 8192 ${access_size} 1 0 ${numThreads} 0 &>> log-${pattern}.txt
     done
-    printf "\n\n" &>> log-single-numa-${pattern}.txt
+    printf "\n\n" &>> log-${pattern}.txt
 done
