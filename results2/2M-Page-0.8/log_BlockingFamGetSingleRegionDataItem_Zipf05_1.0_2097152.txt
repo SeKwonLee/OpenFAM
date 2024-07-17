@@ -1,23 +1,28 @@
-BlockingFamGetSingleRegionDataItem UnifRand 1
+BlockingFamGetSingleRegionDataItem Zipf05 1 1.0
 gDataSize = 64
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 707071948 us
-Elapsed time (ms): 707072 ms
-Elapsed time (sec): 707 sec
-Throughput: 0.189822 Mops/sec
-Throughput: 0.011314 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (723878 ms)
-[----------] 1 test from FamPutGet (723878 ms total)
+Elapsed time (us): 61527683 us
+Elapsed time (ms): 61528 ms
+Elapsed time (sec): 62 sec
+Throughput: 2.181420 Mops/sec
+Throughput: 0.130023 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 134217728
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (316709 ms)
+[----------] 1 test from FamPutGet (316709 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (723878 ms total)
+[==========] 1 test from 1 test suite ran. (316710 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -31,23 +36,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 128
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 354987859 us
-Elapsed time (ms): 354988 ms
-Elapsed time (sec): 355 sec
-Throughput: 0.189046 Mops/sec
-Throughput: 0.022536 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (369435 ms)
-[----------] 1 test from FamPutGet (369435 ms total)
+Elapsed time (us): 27691561 us
+Elapsed time (ms): 27692 ms
+Elapsed time (sec): 28 sec
+Throughput: 2.423441 Mops/sec
+Throughput: 0.288897 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 67108864
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (149750 ms)
+[----------] 1 test from FamPutGet (149750 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (369436 ms total)
+[==========] 1 test from 1 test suite ran. (149750 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -61,23 +71,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 256
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 180892794 us
-Elapsed time (ms): 180893 ms
-Elapsed time (sec): 181 sec
-Throughput: 0.185493 Mops/sec
-Throughput: 0.044225 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (194560 ms)
-[----------] 1 test from FamPutGet (194560 ms total)
+Elapsed time (us): 17614430 us
+Elapsed time (ms): 17614 ms
+Elapsed time (sec): 18 sec
+Throughput: 1.904940 Mops/sec
+Throughput: 0.454173 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 33554432
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (81146 ms)
+[----------] 1 test from FamPutGet (81146 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (194560 ms total)
+[==========] 1 test from 1 test suite ran. (81146 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -91,23 +106,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 512
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 91687423 us
-Elapsed time (ms): 91687 ms
-Elapsed time (sec): 92 sec
-Throughput: 0.182983 Mops/sec
-Throughput: 0.087253 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (104721 ms)
-[----------] 1 test from FamPutGet (104721 ms total)
+Elapsed time (us): 8404639 us
+Elapsed time (ms): 8405 ms
+Elapsed time (sec): 8 sec
+Throughput: 1.996185 Mops/sec
+Throughput: 0.951855 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 16777216
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (43159 ms)
+[----------] 1 test from FamPutGet (43159 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (104721 ms total)
+[==========] 1 test from 1 test suite ran. (43159 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -121,23 +141,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 1024
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 47004260 us
-Elapsed time (ms): 47004 ms
-Elapsed time (sec): 47 sec
-Throughput: 0.178465 Mops/sec
-Throughput: 0.170197 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (59703 ms)
-[----------] 1 test from FamPutGet (59703 ms total)
+Elapsed time (us): 5330859 us
+Elapsed time (ms): 5331 ms
+Elapsed time (sec): 5 sec
+Throughput: 1.573594 Mops/sec
+Throughput: 1.500696 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 8388608
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (27788 ms)
+[----------] 1 test from FamPutGet (27788 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (59703 ms total)
+[==========] 1 test from 1 test suite ran. (27788 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -151,23 +176,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 2048
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 25133298 us
-Elapsed time (ms): 25133 ms
-Elapsed time (sec): 25 sec
-Throughput: 0.166882 Mops/sec
-Throughput: 0.318303 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (37572 ms)
-[----------] 1 test from FamPutGet (37573 ms total)
+Elapsed time (us): 3678140 us
+Elapsed time (ms): 3678 ms
+Elapsed time (sec): 4 sec
+Throughput: 1.140333 Mops/sec
+Throughput: 2.175012 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 4194304
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (20715 ms)
+[----------] 1 test from FamPutGet (20715 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (37573 ms total)
+[==========] 1 test from 1 test suite ran. (20716 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -181,23 +211,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 4096
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 13550293 us
-Elapsed time (ms): 13550 ms
-Elapsed time (sec): 14 sec
-Throughput: 0.154768 Mops/sec
-Throughput: 0.590393 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (25858 ms)
-[----------] 1 test from FamPutGet (25859 ms total)
+Elapsed time (us): 2606476 us
+Elapsed time (ms): 2606 ms
+Elapsed time (sec): 3 sec
+Throughput: 0.804593 Mops/sec
+Throughput: 3.069278 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 2097152
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (17583 ms)
+[----------] 1 test from FamPutGet (17583 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (25859 ms total)
+[==========] 1 test from 1 test suite ran. (17583 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -211,23 +246,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 8192
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 8126782 us
-Elapsed time (ms): 8127 ms
-Elapsed time (sec): 8 sec
-Throughput: 0.129027 Mops/sec
-Throughput: 0.984399 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (20407 ms)
-[----------] 1 test from FamPutGet (20407 ms total)
+Elapsed time (us): 1663054 us
+Elapsed time (ms): 1663 ms
+Elapsed time (sec): 2 sec
+Throughput: 0.630512 Mops/sec
+Throughput: 4.810427 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 1048576
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (16173 ms)
+[----------] 1 test from FamPutGet (16174 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (20407 ms total)
+[==========] 1 test from 1 test suite ran. (16175 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -241,23 +281,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 16384
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 4840975 us
-Elapsed time (ms): 4841 ms
-Elapsed time (sec): 5 sec
-Throughput: 0.108302 Mops/sec
-Throughput: 1.652560 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (17067 ms)
-[----------] 1 test from FamPutGet (17067 ms total)
+Elapsed time (us): 1516072 us
+Elapsed time (ms): 1516 ms
+Elapsed time (sec): 2 sec
+Throughput: 0.345820 Mops/sec
+Throughput: 5.276794 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 524288
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15684 ms)
+[----------] 1 test from FamPutGet (15685 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (17067 ms total)
+[==========] 1 test from 1 test suite ran. (15685 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -271,23 +316,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 32768
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 2967525 us
-Elapsed time (ms): 2968 ms
-Elapsed time (sec): 3 sec
-Throughput: 0.088338 Mops/sec
-Throughput: 2.695849 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15057 ms)
-[----------] 1 test from FamPutGet (15057 ms total)
+Elapsed time (us): 1419612 us
+Elapsed time (ms): 1420 ms
+Elapsed time (sec): 1 sec
+Throughput: 0.184659 Mops/sec
+Throughput: 5.635343 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 262144
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15509 ms)
+[----------] 1 test from FamPutGet (15509 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (15057 ms total)
+[==========] 1 test from 1 test suite ran. (15510 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -301,23 +351,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 65536
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 1836407 us
-Elapsed time (ms): 1836 ms
-Elapsed time (sec): 2 sec
-Throughput: 0.071374 Mops/sec
-Throughput: 4.356333 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (14157 ms)
-[----------] 1 test from FamPutGet (14157 ms total)
+Elapsed time (us): 1372488 us
+Elapsed time (ms): 1372 ms
+Elapsed time (sec): 1 sec
+Throughput: 0.095500 Mops/sec
+Throughput: 5.828831 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 131072
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15432 ms)
+[----------] 1 test from FamPutGet (15432 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (14157 ms total)
+[==========] 1 test from 1 test suite ran. (15432 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -331,23 +386,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 131072
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 1227292 us
-Elapsed time (ms): 1227 ms
+Elapsed time (us): 1368100 us
+Elapsed time (ms): 1368 ms
 Elapsed time (sec): 1 sec
-Throughput: 0.053399 Mops/sec
-Throughput: 6.518416 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (13357 ms)
-[----------] 1 test from FamPutGet (13357 ms total)
+Throughput: 0.047903 Mops/sec
+Throughput: 5.847526 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 65536
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15393 ms)
+[----------] 1 test from FamPutGet (15393 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (13357 ms total)
+[==========] 1 test from 1 test suite ran. (15393 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -361,23 +421,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 262144
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 986204 us
-Elapsed time (ms): 986 ms
-Elapsed time (sec): 1 sec
-Throughput: 0.033226 Mops/sec
-Throughput: 8.111912 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (12920 ms)
-[----------] 1 test from FamPutGet (12920 ms total)
+Elapsed time (us): 1527603 us
+Elapsed time (ms): 1528 ms
+Elapsed time (sec): 2 sec
+Throughput: 0.021451 Mops/sec
+Throughput: 5.236963 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 32768
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15824 ms)
+[----------] 1 test from FamPutGet (15824 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (12920 ms total)
+[==========] 1 test from 1 test suite ran. (15824 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -391,23 +456,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 524288
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 898529 us
-Elapsed time (ms): 899 ms
-Elapsed time (sec): 1 sec
-Throughput: 0.018234 Mops/sec
-Throughput: 8.903441 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (13195 ms)
-[----------] 1 test from FamPutGet (13195 ms total)
+Elapsed time (us): 1521686 us
+Elapsed time (ms): 1522 ms
+Elapsed time (sec): 2 sec
+Throughput: 0.010767 Mops/sec
+Throughput: 5.257326 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 16384
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15364 ms)
+[----------] 1 test from FamPutGet (15364 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (13195 ms total)
+[==========] 1 test from 1 test suite ran. (15364 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -421,23 +491,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 1048576
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 910599 us
-Elapsed time (ms): 911 ms
+Elapsed time (us): 1384914 us
+Elapsed time (ms): 1385 ms
 Elapsed time (sec): 1 sec
-Throughput: 0.008996 Mops/sec
-Throughput: 8.785426 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (12950 ms)
-[----------] 1 test from FamPutGet (12950 ms total)
+Throughput: 0.005915 Mops/sec
+Throughput: 5.776532 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 8192
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15606 ms)
+[----------] 1 test from FamPutGet (15606 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (12950 ms total)
+[==========] 1 test from 1 test suite ran. (15606 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0
@@ -451,23 +526,28 @@ metadata service     0  10.1.34.31        8881
 CIS                  0  10.1.34.31        8880
 gDataSize = 2097152
 isRand = 1
-zipf = 0
+zipf = 0.5
 numThreads = 1
+cache_ratio = 1
+cache_page_size = 2097152
 Note: Google Test filter = FamPutGet.BlockingFamGetSingleRegionDataItem
 [==========] Running 1 test from 1 test suite.
 [----------] Global test environment set-up.
 [----------] 1 test from FamPutGet
 [ RUN      ] FamPutGet.BlockingFamGetSingleRegionDataItem
-Elapsed time (us): 830725 us
-Elapsed time (ms): 831 ms
+Elapsed time (us): 1374107 us
+Elapsed time (ms): 1374 ms
 Elapsed time (sec): 1 sec
-Throughput: 0.004931 Mops/sec
-Throughput: 9.630142 GB/sec
-[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (13200 ms)
-[----------] 1 test from FamPutGet (13200 ms total)
+Throughput: 0.002981 Mops/sec
+Throughput: 5.821963 GB/sec
+Cache hit ratio = 100.000000 
+Cache hit count = 4096
+Cache miss count = 0
+[       OK ] FamPutGet.BlockingFamGetSingleRegionDataItem (15145 ms)
+[----------] 1 test from FamPutGet (15145 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (13200 ms total)
+[==========] 1 test from 1 test suite ran. (15145 ms total)
 [  PASSED  ] 1 test.
 finished all testing
 Finalize done : 0

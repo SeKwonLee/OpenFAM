@@ -70,6 +70,7 @@ uint64_t gDataSize = 256;
 int isRand = 0;
 double zipf = 0.0;
 uint64_t numThreads = 1;
+fam_context **ctx;
 
 #define LOCAL_BUFFER_SIZE   2*1024*1024UL   // 2MB
 
@@ -160,9 +161,11 @@ void *func_blocking_put_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
     uint64_t offset = 0;
 
+    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
     for (uint64_t i = 0; i < it->num_ops; i++) {
         offset = it->indexes[i] * gDataSize;
-        my_fam->fam_put_blocking(gLocalBuf, it->item, offset, gDataSize);
+        ctx[it->tid]->fam_put_blocking(LocalBuf, it->item, offset, gDataSize);
     }
 
     pthread_exit(NULL);
@@ -172,9 +175,11 @@ void *func_blocking_get_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
     uint64_t offset = 0;
 
+    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
     for (uint64_t i = 0; i < it->num_ops; i++) {
         offset = it->indexes[i] * gDataSize;
-        my_fam->fam_get_blocking(gLocalBuf, it->item, offset, gDataSize);
+        ctx[it->tid]->fam_get_blocking(LocalBuf, it->item, offset, gDataSize);
     }
 
     pthread_exit(NULL);
@@ -206,6 +211,8 @@ void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
 
+    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
     // Generate random indexes
     std::srand(unsigned(std::time(0)));
     std::vector<uint64_t> indexes;
@@ -233,25 +240,25 @@ void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                    memcpy(LocalBuf, (void *)((uint64_t)*cache_value.first.get() 
                                 + start_page_local_offset), read_size);
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
                             *cache_value.first.get(), read_size);
                 }
             } else {
-                my_fam->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                ctx[it->tid]->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
                         it->item, index * cache_page_size, cache_page_size);
                 it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(gLocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
+                    memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
                                 + start_page_local_offset), read_size);
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
                             (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
                 }
             }
@@ -268,6 +275,8 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
 
+    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
     for (uint64_t i = 0; i < it->num_ops; i++) {
         byte_index = it->indexes[i];
 
@@ -281,32 +290,32 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
 
         uint64_t size_to_read = gDataSize, read_size = 0;
         for (uint64_t index = start_page_index; index <= end_page_index; index++) {
-#if 0
+#if 1
             const auto cache_value = it->cache->TryGet(index);
             if (cache_value.second == true) {
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                    memcpy(LocalBuf, (void *)((uint64_t)*cache_value.first.get() 
                                 + start_page_local_offset), read_size);
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
                             *cache_value.first.get(), read_size);
                 }
                 num_cache_hit++;
             } else {
-                my_fam->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                ctx[it->tid]->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
                         it->item, index * cache_page_size, cache_page_size);
                 it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(gLocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
+                    memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
                                 + start_page_local_offset), read_size);
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
                             (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
                 }
                 num_cache_miss++;
@@ -315,15 +324,14 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
             if (index == start_page_index) {
                 read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                     (cache_page_size - start_page_local_offset) : gDataSize;
-                memcpy(gLocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
+                memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
                             + start_page_local_offset), read_size);
             } else {
                 read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
                         (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
             }
 #endif
-
             size_to_read -= read_size;
         }
     }
@@ -342,6 +350,9 @@ void *func_non_blocking_cache_get_single_region_item_warmup(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
+
+    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
     std::vector<PostProcessInfo> PostProcessInfoArray;
     if (gDataSize < cache_page_size) {
         PostProcessInfoArray.reserve(1);
@@ -376,26 +387,26 @@ void *func_non_blocking_cache_get_single_region_item_warmup(void *arg) {
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                    memcpy(LocalBuf, (void *)((uint64_t)*cache_value.first.get() 
                                 + start_page_local_offset), read_size);
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
                             *cache_value.first.get(), read_size);
                 }
             } else {
                 PostProcessInfo ppi;
                 ppi.index = index;
                 ppi.src = (void *)((uint64_t)it->cache_buf + (index * cache_page_size));
-                my_fam->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                ctx[it->tid]->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
                         it->item, index * cache_page_size, cache_page_size);
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    ppi.dest = gLocalBuf;
+                    ppi.dest = LocalBuf;
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    ppi.dest = (void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read));
+                    ppi.dest = (void *)((uint64_t)LocalBuf + (gDataSize - size_to_read));
                 }
                 ppi.read_size = read_size;
                 PostProcessInfoArray.push_back(ppi);
@@ -405,7 +416,7 @@ void *func_non_blocking_cache_get_single_region_item_warmup(void *arg) {
         }
 
         if (PostProcessInfoArray.size() > 0) {
-            my_fam->fam_quiet();
+            ctx[it->tid]->fam_quiet();
             for (auto & info : PostProcessInfoArray) {
                 it->cache->Put(info.index, info.src);
                 memcpy(info.dest, info.src, info.read_size);
@@ -421,6 +432,9 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
+
+    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
     std::vector<PostProcessInfo> PostProcessInfoArray;
     if (gDataSize < cache_page_size) {
         PostProcessInfoArray.reserve(1);
@@ -446,11 +460,11 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(gLocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                    memcpy(LocalBuf, (void *)((uint64_t)*cache_value.first.get() 
                                 + start_page_local_offset), read_size);
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read)),
+                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
                             *cache_value.first.get(), read_size);
                 }
                 num_cache_hit++;
@@ -458,15 +472,15 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
                 PostProcessInfo ppi;
                 ppi.index = index;
                 ppi.src = (void *)((uint64_t)it->cache_buf + (index * cache_page_size));
-                my_fam->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                ctx[it->tid]->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
                         it->item, index * cache_page_size, cache_page_size);
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    ppi.dest = gLocalBuf;
+                    ppi.dest = LocalBuf;
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    ppi.dest = (void *)((uint64_t)gLocalBuf + (gDataSize - size_to_read));
+                    ppi.dest = (void *)((uint64_t)LocalBuf + (gDataSize - size_to_read));
                 }
                 ppi.read_size = read_size;
                 PostProcessInfoArray.push_back(ppi);
@@ -477,7 +491,7 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
         }
 
         if (PostProcessInfoArray.size() > 0) {
-            my_fam->fam_quiet();
+            ctx[it->tid]->fam_quiet();
             for (auto & info : PostProcessInfoArray) {
                 it->cache->Put(info.index, info.src);
                 memcpy(info.dest, info.src, info.read_size);
@@ -671,6 +685,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         caches[i] = new lru_cache_t<uint64_t, void *>(cache_size);
         infos[i].cache = caches[i];
         infos[i].cache_buf = gCacheBuf;
+        //infos[i].cache_buf = gCacheBuf + ((gItemSize / numThreads) * i);
     }
 #endif
 
@@ -747,19 +762,19 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         }
     }
 
-//#ifdef ENABLE_LOCAL_CACHE
-//    for (uint64_t i = 0; i < numThreads; i++) {
-//        if ((rc = pthread_create(&threads[i], NULL, 
-//                        func_blocking_cache_get_single_region_item_warmup, &infos[i]))) {
-//            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
-//            exit(1);
-//        }
-//    }
-//
-//    for (uint64_t i = 0; i < numThreads; i++) {
-//        pthread_join(threads[i], NULL);
-//    }
-//#endif
+#ifdef ENABLE_LOCAL_CACHE
+    for (uint64_t i = 0; i < numThreads; i++) {
+        if ((rc = pthread_create(&threads[i], NULL, 
+                        func_blocking_cache_get_single_region_item_warmup, &infos[i]))) {
+            fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+            exit(1);
+        }
+    }
+
+    for (uint64_t i = 0; i < numThreads; i++) {
+        pthread_join(threads[i], NULL);
+    }
+#endif
 
     auto starttime = std::chrono::system_clock::now();
 #ifdef ENABLE_LOCAL_CACHE
@@ -836,6 +851,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
         caches[i] = new lru_cache_t<uint64_t, void *>(cache_size);
         infos[i].cache = caches[i];
         infos[i].cache_buf = gCacheBuf;
+        //infos[i].cache_buf = gCacheBuf + ((gItemSize / numThreads) * i);
     }
 #endif
 
@@ -976,7 +992,6 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     free(infos);
     free(threads);
 }
-
 
 // Test case -  Blocking put test by multiple threads on multiple regions and data items.
 TEST(FamPutGet, BlockingFamPutMultipleRegionDataItem) {
@@ -1302,14 +1317,13 @@ int main(int argc, char **argv) {
 
     init_fam_options(&fam_opts);
 
+    gLocalBuf = (int64_t *)malloc(LOCAL_BUFFER_SIZE * numThreads);
+    //gLocalBuf = (int64_t *)numa_alloc_onnode(LOCAL_BUFFER_SIZE * numThreads, 1);
+    memset(gLocalBuf, 2, LOCAL_BUFFER_SIZE * numThreads);
 #ifdef ENABLE_LOCAL_CACHE
-    gLocalBuf = (int64_t *)malloc(LOCAL_BUFFER_SIZE);
-    //gLocalBuf = (int64_t *)numa_alloc_onnode(LOCAL_BUFFER_SIZE, 1);
-    memset(gLocalBuf, 0, LOCAL_BUFFER_SIZE);
 #if 1
     gCacheBuf = malloc(gItemSize);
     //gCacheBuf = numa_alloc_onnode(gItemSize, 0);
-    memset(gCacheBuf, 0, gItemSize);
 #else
     int fd = open("/mnt/hugetlbfs/gCacheBuf", O_CREAT | O_RDWR, 0755);
     if (fd < 0) {
@@ -1330,20 +1344,28 @@ int main(int argc, char **argv) {
         return 1;
     }
 #endif
-    fam_opts.local_buf_addr = gCacheBuf;
-    fam_opts.local_buf_size = gItemSize;
-#else
-    gLocalBuf = (int64_t *)malloc(gDataSize);
-    fam_opts.local_buf_addr = gLocalBuf;
-    fam_opts.local_buf_size = gDataSize;
+    memset(gCacheBuf, 1, gItemSize);
 #endif
+
+    fam_opts.local_buf_addr = gLocalBuf;
+    fam_opts.local_buf_size = LOCAL_BUFFER_SIZE * numThreads;
 
     fam_opts.famThreadModel = strdup("FAM_THREAD_MULTIPLE");
 
     EXPECT_NO_THROW(my_fam->fam_initialize("default", &fam_opts));
     EXPECT_NO_THROW(myPE = (int *)my_fam->fam_get_option(strdup("PE_ID")));
 
+    ctx = (fam_context **) malloc(sizeof(fam_context *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        ctx[i] = my_fam->fam_context_open();
+    }
+
     ret = RUN_ALL_TESTS();
+
+    for (uint64_t i = 0; i < numThreads; i++) {
+        my_fam->fam_context_close(ctx[i]);
+    }
+    free(ctx);
 
     cout << "finished all testing" << endl;
     EXPECT_NO_THROW(my_fam->fam_finalize("default"));
