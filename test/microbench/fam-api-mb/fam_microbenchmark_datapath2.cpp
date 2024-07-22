@@ -214,56 +214,59 @@ void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
     void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
 
     // Generate random indexes
+    uint64_t total_indexes = gItemSize / gDataSize;
+    uint64_t max_indexes_per_thread = (gItemSize / gDataSize) / numThreads;
     std::srand(unsigned(std::time(0)));
     std::vector<uint64_t> indexes;
-    indexes.reserve(it->num_ops);
-    for (uint64_t i = 0; i < it->num_ops; i++) {
+    indexes.reserve(total_indexes);
+    for (uint64_t i = 0; i < total_indexes; i++) {
         indexes[i] = i;
     }
     std::random_shuffle(indexes.begin(), indexes.end());
 
     for (uint64_t i = 0; i < it->num_ops; i++) {
         byte_index = indexes[i];
+        if (byte_index % numThreads == it->tid) {
+            start_byte_offset = (byte_index % max_indexes_per_thread) * gDataSize;
+            end_byte_offset = start_byte_offset + gDataSize;
 
-        start_byte_offset = byte_index * gDataSize;
-        end_byte_offset = start_byte_offset + gDataSize;
+            start_page_index = offset_to_start_page_index(start_byte_offset);
+            end_page_index = offset_to_end_page_index(end_byte_offset);
 
-        start_page_index = offset_to_start_page_index(start_byte_offset);
-        end_page_index = offset_to_end_page_index(end_byte_offset);
+            start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
 
-        start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
-
-        uint64_t size_to_read = gDataSize, read_size = 0;
-        for (uint64_t index = start_page_index; index <= end_page_index; index++) {
-            const auto cache_value = it->cache->TryGet(index);
-            if (cache_value.second == true) {
-                if (index == start_page_index) {
-                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
-                        (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(LocalBuf, (void *)((uint64_t)*cache_value.first.get() 
-                                + start_page_local_offset), read_size);
+            uint64_t size_to_read = gDataSize, read_size = 0;
+            for (uint64_t index = start_page_index; index <= end_page_index; index++) {
+                const auto cache_value = it->cache->TryGet(index);
+                if (cache_value.second == true) {
+                    if (index == start_page_index) {
+                        read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                            (cache_page_size - start_page_local_offset) : gDataSize;
+                        memcpy(LocalBuf, (void *)((uint64_t)*cache_value.first.get() 
+                                    + start_page_local_offset), read_size);
+                    } else {
+                        read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                        memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
+                                *cache_value.first.get(), read_size);
+                    }
                 } else {
-                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
-                            *cache_value.first.get(), read_size);
+                    ctx[it->tid]->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                            it->item, index * cache_page_size, cache_page_size);
+                    it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
+                    if (index == start_page_index) {
+                        read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
+                            (cache_page_size - start_page_local_offset) : gDataSize;
+                        memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
+                                    + start_page_local_offset), read_size);
+                    } else {
+                        read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                        memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
+                                (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
+                    }
                 }
-            } else {
-                ctx[it->tid]->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
-                        it->item, index * cache_page_size, cache_page_size);
-                it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
-                if (index == start_page_index) {
-                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
-                        (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
-                                + start_page_local_offset), read_size);
-                } else {
-                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
-                            (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
-                }
+
+                size_to_read -= read_size;
             }
-
-            size_to_read -= read_size;
         }
     }
 
