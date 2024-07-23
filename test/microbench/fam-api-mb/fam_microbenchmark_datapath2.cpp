@@ -88,16 +88,16 @@ uint64_t num_cache_hit = 0;
 uint64_t num_cache_miss = 0;
 #endif
 
-typedef struct {
+struct ValueInfo {
     Fam_Descriptor *item;
     uint64_t tid;
     uint64_t num_ops;
-    uint64_t *indexes;
+    std::vector<uint64_t> indexes;
 #ifdef ENABLE_LOCAL_CACHE
     lru_cache_t<uint64_t, void *> *cache;
     void *cache_buf;
 #endif
-} ValueInfo;
+};
 
 #ifdef MEMSERVER_PROFILE
 #define RESET_PROFILE()                                                        \
@@ -206,16 +206,17 @@ uint64_t page_index_to_page_local_offset(uint64_t byte_offset, uint64_t page_ind
     return (byte_offset - (page_index * cache_page_size));
 }
 
-void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
+void *func_cache_get_single_region_item_warmup(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
 
     void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+    
+    uint64_t max_indexes_per_thread = (gItemSize / numThreads) / cache_page_size;
 
     // Generate random indexes
     uint64_t total_indexes = gItemSize / gDataSize;
-    uint64_t max_indexes_per_thread = (gItemSize / gDataSize) / numThreads;
     std::srand(unsigned(std::time(0)));
     std::vector<uint64_t> indexes;
     indexes.reserve(total_indexes);
@@ -227,7 +228,7 @@ void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
     for (uint64_t i = 0; i < it->num_ops; i++) {
         byte_index = indexes[i];
         if (byte_index % numThreads == it->tid) {
-            start_byte_offset = (byte_index % max_indexes_per_thread) * gDataSize;
+            start_byte_offset = byte_index * gDataSize;
             end_byte_offset = start_byte_offset + gDataSize;
 
             start_page_index = offset_to_start_page_index(start_byte_offset);
@@ -235,7 +236,7 @@ void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
 
             start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
 
-            uint64_t size_to_read = gDataSize, read_size = 0;
+            uint64_t size_to_read = gDataSize, read_size = 0, thread_local_page_start_addr = 0;
             for (uint64_t index = start_page_index; index <= end_page_index; index++) {
                 const auto cache_value = it->cache->TryGet(index);
                 if (cache_value.second == true) {
@@ -250,18 +251,18 @@ void *func_blocking_cache_get_single_region_item_warmup(void *arg) {
                                 *cache_value.first.get(), read_size);
                     }
                 } else {
-                    ctx[it->tid]->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                    thread_local_page_start_addr = (uint64_t)it->cache_buf + ((index % max_indexes_per_thread) * cache_page_size);
+                    ctx[it->tid]->fam_get_blocking((void *)(thread_local_page_start_addr),
                             it->item, index * cache_page_size, cache_page_size);
-                    it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
+                    it->cache->Put(index, (void *)(thread_local_page_start_addr));
                     if (index == start_page_index) {
                         read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                             (cache_page_size - start_page_local_offset) : gDataSize;
-                        memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
-                                    + start_page_local_offset), read_size);
+                        memcpy(LocalBuf, (void *)(thread_local_page_start_addr + start_page_local_offset), read_size);
                     } else {
                         read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
                         memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
-                                (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
+                                (void *)(thread_local_page_start_addr), read_size);
                     }
                 }
 
@@ -280,6 +281,8 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
 
     void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
 
+    uint64_t max_indexes_per_thread = (gItemSize / numThreads) / cache_page_size;
+
     for (uint64_t i = 0; i < it->num_ops; i++) {
         byte_index = it->indexes[i];
 
@@ -291,7 +294,7 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
 
         start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
 
-        uint64_t size_to_read = gDataSize, read_size = 0;
+        uint64_t size_to_read = gDataSize, read_size = 0, thread_local_page_start_addr = 0;
         for (uint64_t index = start_page_index; index <= end_page_index; index++) {
 #if 1
             const auto cache_value = it->cache->TryGet(index);
@@ -308,31 +311,31 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
                 }
                 num_cache_hit++;
             } else {
-                ctx[it->tid]->fam_get_blocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                thread_local_page_start_addr = (uint64_t)it->cache_buf + ((index % max_indexes_per_thread) * cache_page_size);
+                ctx[it->tid]->fam_get_blocking((void *)(thread_local_page_start_addr),
                         it->item, index * cache_page_size, cache_page_size);
-                it->cache->Put(index, (void *)((uint64_t)it->cache_buf + (index * cache_page_size)));
+                it->cache->Put(index, (void *)(thread_local_page_start_addr));
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
-                                + start_page_local_offset), read_size);
+                    memcpy(LocalBuf, (void *)(thread_local_page_start_addr + start_page_local_offset), read_size);
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
                     memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
-                            (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
+                            (void *)(thread_local_page_start_addr), read_size);
                 }
                 num_cache_miss++;
             }
 #else
+            thread_local_page_start_addr = (uint64_t)it->cache_buf + ((index % max_indexes_per_thread) * cache_page_size);
             if (index == start_page_index) {
                 read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                     (cache_page_size - start_page_local_offset) : gDataSize;
-                memcpy(LocalBuf, (void *)((uint64_t)it->cache_buf + (index * cache_page_size) 
-                            + start_page_local_offset), read_size);
+                memcpy(LocalBuf, (void *)(thread_local_page_start_addr + start_page_local_offset), read_size);
             } else {
                 read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
                 memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
-                        (void *)((uint64_t)it->cache_buf + (index * cache_page_size)), read_size);
+                        (void *)(thread_local_page_start_addr), read_size);
             }
 #endif
             size_to_read -= read_size;
@@ -344,92 +347,11 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
 
 typedef struct PostProcessInfo {
     uint64_t index;
-    void *src;
+    void *index_src;
+    void *copy_src;
     void *dest;
     uint64_t read_size;
 } PostProcessInfo;
-
-void *func_non_blocking_cache_get_single_region_item_warmup(void *arg) {
-    ValueInfo *it = (ValueInfo *)arg;
-    uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
-             start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
-
-    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
-
-    std::vector<PostProcessInfo> PostProcessInfoArray;
-    if (gDataSize < cache_page_size) {
-        PostProcessInfoArray.reserve(1);
-    } else {
-        PostProcessInfoArray.reserve((size_t)(gDataSize/cache_page_size));
-    }
-
-    // Generate random indexes
-    std::srand(unsigned(std::time(0)));
-    std::vector<uint64_t> indexes;
-    indexes.reserve(it->num_ops);
-    for (uint64_t i = 0; i < it->num_ops; i++) {
-        indexes[i] = i;
-    }
-    std::random_shuffle(indexes.begin(), indexes.end());
-
-    for (uint64_t i = 0; i < it->num_ops; i++) {
-        byte_index = indexes[i];
-
-        start_byte_offset = byte_index * gDataSize;
-        end_byte_offset = start_byte_offset + gDataSize;
-
-        start_page_index = offset_to_start_page_index(start_byte_offset);
-        end_page_index = offset_to_end_page_index(end_byte_offset);
-
-        start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
-
-        uint64_t size_to_read = gDataSize, read_size = 0;
-        for (uint64_t index = start_page_index; index <= end_page_index; index++) {
-            const auto cache_value = it->cache->TryGet(index);
-            if (cache_value.second == true) {
-                if (index == start_page_index) {
-                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
-                        (cache_page_size - start_page_local_offset) : gDataSize;
-                    memcpy(LocalBuf, (void *)((uint64_t)*cache_value.first.get() 
-                                + start_page_local_offset), read_size);
-                } else {
-                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    memcpy((void *)((uint64_t)LocalBuf + (gDataSize - size_to_read)),
-                            *cache_value.first.get(), read_size);
-                }
-            } else {
-                PostProcessInfo ppi;
-                ppi.index = index;
-                ppi.src = (void *)((uint64_t)it->cache_buf + (index * cache_page_size));
-                ctx[it->tid]->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
-                        it->item, index * cache_page_size, cache_page_size);
-                if (index == start_page_index) {
-                    read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
-                        (cache_page_size - start_page_local_offset) : gDataSize;
-                    ppi.dest = LocalBuf;
-                } else {
-                    read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
-                    ppi.dest = (void *)((uint64_t)LocalBuf + (gDataSize - size_to_read));
-                }
-                ppi.read_size = read_size;
-                PostProcessInfoArray.push_back(ppi);
-            }
-
-            size_to_read -= read_size;
-        }
-
-        if (PostProcessInfoArray.size() > 0) {
-            ctx[it->tid]->fam_quiet();
-            for (auto & info : PostProcessInfoArray) {
-                it->cache->Put(info.index, info.src);
-                memcpy(info.dest, info.src, info.read_size);
-            }
-            PostProcessInfoArray.clear();
-        }
-    }
-
-    pthread_exit(NULL);
-}
 
 void *func_non_blocking_cache_get_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
@@ -437,6 +359,8 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
 
     void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
+    uint64_t max_indexes_per_thread = (gItemSize / numThreads) / cache_page_size;
 
     std::vector<PostProcessInfo> PostProcessInfoArray;
     if (gDataSize < cache_page_size) {
@@ -456,7 +380,7 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
 
         start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
 
-        uint64_t size_to_read = gDataSize, read_size = 0;
+        uint64_t size_to_read = gDataSize, read_size = 0, thread_local_page_start_addr = 0;
         for (uint64_t index = start_page_index; index <= end_page_index; index++) {
             const auto cache_value = it->cache->TryGet(index);
             if (cache_value.second == true) {
@@ -472,17 +396,20 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
                 }
                 num_cache_hit++;
             } else {
+                thread_local_page_start_addr = (uint64_t)it->cache_buf + ((index % max_indexes_per_thread) * cache_page_size);
                 PostProcessInfo ppi;
                 ppi.index = index;
-                ppi.src = (void *)((uint64_t)it->cache_buf + (index * cache_page_size));
-                ctx[it->tid]->fam_get_nonblocking((void *)((uint64_t)it->cache_buf + (index * cache_page_size)),
+                ppi.index_src = (void *)(thread_local_page_start_addr);
+                ctx[it->tid]->fam_get_nonblocking((void *)(thread_local_page_start_addr),
                         it->item, index * cache_page_size, cache_page_size);
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
+                    ppi.copy_src = (void *)(thread_local_page_start_addr + start_page_local_offset);
                     ppi.dest = LocalBuf;
                 } else {
                     read_size = size_to_read > cache_page_size ? cache_page_size : size_to_read;
+                    ppi.copy_src = (void *)(thread_local_page_start_addr);
                     ppi.dest = (void *)((uint64_t)LocalBuf + (gDataSize - size_to_read));
                 }
                 ppi.read_size = read_size;
@@ -496,8 +423,8 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
         if (PostProcessInfoArray.size() > 0) {
             ctx[it->tid]->fam_quiet();
             for (auto & info : PostProcessInfoArray) {
-                it->cache->Put(info.index, info.src);
-                memcpy(info.dest, info.src, info.read_size);
+                it->cache->Put(info.index, info.index_src);
+                memcpy(info.dest, info.copy_src, info.read_size);
             }
             PostProcessInfoArray.clear();
         }
@@ -564,7 +491,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
-    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+    ValueInfo *infos = new ValueInfo[numThreads];
 
     std::string regionPrefix("region");
     std::string itemPrefix("item");
@@ -605,7 +532,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
         infos[i].item = items[i];
         infos[i].tid = i;
         infos[i].num_ops = num_indexes / numThreads;
-        infos[i].indexes = (uint64_t *) calloc(1, sizeof(uint64_t) * infos[i].num_ops);
+        infos[i].indexes.reserve(infos[i].num_ops);
 
         if (isRand) {
             if (zipf > 0) {
@@ -662,10 +589,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     free(descs);
 
     free(sum_probs);
-    for (uint64_t i = 0; i < numThreads; i++) {
-        free(infos[i].indexes);
-    }
-    free(infos);
+    delete[] infos;
     free(threads);
 }
 
@@ -678,7 +602,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
-    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+    ValueInfo *infos = new ValueInfo[numThreads];
 
 #ifdef ENABLE_LOCAL_CACHE
     size_t cache_size = (size_t)((double)(((double)gItemSize / (double)cache_page_size) 
@@ -687,8 +611,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     for (uint64_t i = 0; i < numThreads; i++) {
         caches[i] = new lru_cache_t<uint64_t, void *>(cache_size);
         infos[i].cache = caches[i];
-        infos[i].cache_buf = gCacheBuf;
-        //infos[i].cache_buf = gCacheBuf + ((gItemSize / numThreads) * i);
+        infos[i].cache_buf = (void *)((uint64_t)gCacheBuf + ((gItemSize / numThreads) * i));
     }
 #endif
 
@@ -740,35 +663,33 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     for (uint64_t i = 0; i < numThreads; i++) {
         infos[i].item = items[i];
         infos[i].tid = i;
-        infos[i].num_ops = num_indexes / numThreads;
-        infos[i].indexes = (uint64_t *) calloc(1, sizeof(uint64_t) * infos[i].num_ops);
+        infos[i].num_ops = 0;
+    }
 
+    uint64_t sample_index = 0;
+    for (uint64_t i = 0; i < num_ios; i++) {
         if (isRand) {
             if (zipf > 0) {
-                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
-                    infos[i].indexes[j] = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
-                    infos[i].indexes[j] -= 1;
-                }
+                sample_index = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
+                sample_index -= 1;
             } else {
                 // Uniform random
-                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
-                    infos[i].indexes[j] = uniform_random_indexes.back();
-                    uniform_random_indexes.pop_back();
-                }
+                sample_index = uniform_random_indexes.back();
+                uniform_random_indexes.pop_back();
             }
         } else {
             // Sequential
-            uint64_t start_idx = infos[i].num_ops * infos[i].tid;
-            for (uint64_t j = 0; j < infos[i].num_ops; j++) {
-                infos[i].indexes[j] = start_idx + j;
-            }
+            sample_index = i;
         }
+
+        infos[sample_index % numThreads].indexes.push_back(sample_index);
+        infos[sample_index % numThreads].num_ops++;
     }
 
 #ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
-                        func_blocking_cache_get_single_region_item_warmup, &infos[i]))) {
+                        func_cache_get_single_region_item_warmup, &infos[i]))) {
             fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
             exit(1);
         }
@@ -823,16 +744,13 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     free(descs);
 
     free(sum_probs);
+#ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
-        free(infos[i].indexes);
-#ifdef ENABLE_LOCAL_CACHE
         delete infos[i].cache;
-#endif
     }
-#ifdef ENABLE_LOCAL_CACHE
     free(caches);
 #endif
-    free(infos);
+    delete[] infos;
     free(threads);
 }
 
@@ -845,7 +763,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
-    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+    ValueInfo *infos = new ValueInfo[numThreads];
 
 #ifdef ENABLE_LOCAL_CACHE
     size_t cache_size = (size_t)((double)(((double)gItemSize / (double)cache_page_size) / (double)numThreads) * cache_ratio);
@@ -853,8 +771,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     for (uint64_t i = 0; i < numThreads; i++) {
         caches[i] = new lru_cache_t<uint64_t, void *>(cache_size);
         infos[i].cache = caches[i];
-        infos[i].cache_buf = gCacheBuf;
-        //infos[i].cache_buf = gCacheBuf + ((gItemSize / numThreads) * i);
+        infos[i].cache_buf = (void *)((uint64_t)gCacheBuf + ((gItemSize / numThreads) * i));
     }
 #endif
 
@@ -879,6 +796,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     //my_fam->fam_barrier_all();
 
     uint64_t num_indexes = num_ios;
+    std::vector<uint64_t> uniform_random_indexes;
     double base = 0;
     unsigned seed = 0;
 
@@ -888,47 +806,50 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
         base = get_base((unsigned)num_indexes, zipf);
         sum_probs[0] = 0;
 
+        seed = (unsigned)time(NULL);
+
         for (unsigned i = 1; i <= num_indexes; i++) {
             sum_probs[i] = sum_probs[i - 1] + base / pow((double)i, zipf);
         }
+    } else {
+        // Generate random indexes
+        std::srand(unsigned(std::time(0)));
+        for (uint64_t i = 0; i < num_indexes; i++) {
+            uniform_random_indexes.push_back(i);
+        }
+        std::random_shuffle(uniform_random_indexes.begin(), uniform_random_indexes.end());
     }
 
     for (uint64_t i = 0; i < numThreads; i++) {
         infos[i].item = items[i];
         infos[i].tid = i;
-        infos[i].num_ops = num_indexes / numThreads;
-        infos[i].indexes = (uint64_t *) calloc(1, sizeof(uint64_t) * infos[i].num_ops);
+        infos[i].num_ops = 0;
+    }
 
+    uint64_t sample_index = 0;
+    for (uint64_t i = 0; i < num_ios; i++) {
         if (isRand) {
             if (zipf > 0) {
-                seed = (unsigned)time(NULL);
-                seed += (unsigned)infos[i].tid;
-                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
-                    infos[i].indexes[j] = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
-                    infos[i].indexes[j] -= 1;
-                }
+                sample_index = (uint64_t) sample((int)num_ios, seed, base, sum_probs);
+                sample_index -= 1;
             } else {
-                uint64_t start_idx = infos[i].num_ops * infos[i].tid;
-                uint64_t end_idx = start_idx + infos[i].num_ops - 1;
-
-                std::default_random_engine generator;
-                std::uniform_int_distribution<uint64_t> distribution(start_idx, end_idx);
-                for (uint64_t j = 0; j < infos[i].num_ops; j++) {
-                    infos[i].indexes[j] = distribution(generator);
-                }
+                // Uniform random
+                sample_index = uniform_random_indexes.back();
+                uniform_random_indexes.pop_back();
             }
         } else {
-            uint64_t start_idx = infos[i].num_ops * infos[i].tid;
-            for (uint64_t j = 0; j < infos[i].num_ops; j++) {
-                infos[i].indexes[j] = start_idx + j;
-            }
+            // Sequential
+            sample_index = i;
         }
+
+        infos[sample_index % numThreads].indexes.push_back(sample_index);
+        infos[sample_index % numThreads].num_ops++;
     }
 
 #ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
-                        func_non_blocking_cache_get_single_region_item_warmup, &infos[i]))) {
+                        func_cache_get_single_region_item_warmup, &infos[i]))) {
             fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
             exit(1);
         }
@@ -983,16 +904,13 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     free(descs);
 
     free(sum_probs);
+#ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
-        free(infos[i].indexes);
-#ifdef ENABLE_LOCAL_CACHE
         delete infos[i].cache;
-#endif
     }
-#ifdef ENABLE_LOCAL_CACHE
     free(caches);
 #endif
-    free(infos);
+    delete[] infos;
     free(threads);
 }
 
@@ -1005,7 +923,7 @@ TEST(FamPutGet, BlockingFamPutMultipleRegionDataItem) {
     Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
-    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+    ValueInfo *infos = new ValueInfo[numThreads];
 
     std::string regionPrefix("region");
     std::string itemPrefix("item");
@@ -1062,7 +980,7 @@ TEST(FamPutGet, BlockingFamPutMultipleRegionDataItem) {
     }
     free(descs);
 
-    free(infos);
+    delete[] infos;
     free(threads);
 }
 
@@ -1075,7 +993,7 @@ TEST(FamPutGet, BlockingFamGetMultipleRegionDataItem) {
     Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
-    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+    ValueInfo *infos = new ValueInfo[numThreads];
 
     std::string regionPrefix("region");
     std::string itemPrefix("item");
@@ -1132,7 +1050,7 @@ TEST(FamPutGet, BlockingFamGetMultipleRegionDataItem) {
     }
     free(descs);
 
-    free(infos);
+    delete[] infos;
     free(threads);
 }
 
@@ -1145,7 +1063,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionMultipleDataItem) {
     Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
-    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+    ValueInfo *infos = new ValueInfo[numThreads];
 
     std::string regionPrefix("region");
     std::string itemPrefix("item");
@@ -1205,7 +1123,7 @@ TEST(FamPutGet, BlockingFamPutSingleRegionMultipleDataItem) {
     EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
     free(descs);
 
-    free(infos);
+    delete[] infos;
     free(threads);
 }
 
@@ -1218,7 +1136,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionMultipleDataItem) {
     Fam_Region_Descriptor **descs = (Fam_Region_Descriptor **)malloc(sizeof(Fam_Region_Descriptor *) * numThreads);
     Fam_Descriptor **items = (Fam_Descriptor **)malloc(sizeof(Fam_Descriptor *) * numThreads);
 
-    ValueInfo *infos = (ValueInfo *)malloc(sizeof(ValueInfo) * numThreads);
+    ValueInfo *infos = new ValueInfo[numThreads];
 
     std::string regionPrefix("region");
     std::string itemPrefix("item");
@@ -1278,7 +1196,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionMultipleDataItem) {
     EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
     free(descs);
 
-    free(infos);
+    delete[] infos;
     free(threads);
 }
 
