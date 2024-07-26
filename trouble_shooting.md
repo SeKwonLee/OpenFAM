@@ -164,3 +164,33 @@ The following tests FAILED:
 ```
 
 ### Solution
+
+
+## Issue 8: Duplicate local buffer registration from fam_context_open
+
+### Error
+```
+unknown file: Failure
+
+#0  0x00007ffff7ec6a56 in fi_close (fid=0x55555571c0c0)
+    at /home/leesek/projects/OpenFAM/third-party/build/include/rdma/fabric.h:603
+#1  openfam::Fam_Context::~Fam_Context (this=0x555555630cb0, __in_chrg=<optimized out>)
+    at /home/leesek/projects/OpenFAM/src/common/fam_context.cpp:145
+#2  0x00007ffff7e9c2f1 in openfam::Fam_Ops_Libfabric::finalize (this=0x55555562a380)
+    at /home/leesek/projects/OpenFAM/src/fam-api/fam_ops_libfabric.cpp:364
+#3  0x00007ffff7e7d5df in openfam::fam::Impl_::fam_finalize (this=0x5555555f2580, groupName=<optimized out>)
+    at /home/leesek/projects/OpenFAM/src/fam-api/fam.cpp:1186
+#4  0x00007ffff7e7d610 in openfam::fam::fam_finalize (this=<optimized out>, groupName=<optimized out>)
+    at /home/leesek/projects/OpenFAM/src/fam-api/fam.cpp:5434
+#5  0x000055555557f033 in main (argc=<optimized out>, argv=<optimized out>)
+    at /home/leesek/projects/OpenFAM/test/microbench/fam-api-mb/fam_microbenchmark_datapath2.cpp:1335
+```
+
+### Solution
+```
+Copy mr descriptors to the new Fam_Context from the existing context if there is
+a local buffer already registered, instead of registering the same buffer.
+
+Refer to the commit
+https://github.com/SeKwonLee/OpenFAM/commit/f46c7f08299a59ef97a4dcce2ffd640c56a7e490
+```
