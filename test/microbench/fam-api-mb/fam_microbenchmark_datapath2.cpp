@@ -157,10 +157,22 @@ int sample(int n, unsigned &seed, double base,
     return zipf_value;
 }
 
+void pinThreadToCore(int core_id) {
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(core_id, &cpuset);
+
+	int result = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
+	if (result != 0) {
+		fprintf(stderr, "Error setting thread affinity: %d\n", result);
+	}
+}
+
 void *func_blocking_put_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
-    uint64_t offset = 0;
+    pinThreadToCore((int)it->tid);
 
+    uint64_t offset = 0;
     void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
 
     for (uint64_t i = 0; i < it->num_ops; i++) {
@@ -173,8 +185,9 @@ void *func_blocking_put_single_region_item(void *arg) {
 
 void *func_blocking_get_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
-    uint64_t offset = 0;
+    pinThreadToCore((int)it->tid);
 
+    uint64_t offset = 0;
     void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
 
     for (uint64_t i = 0; i < it->num_ops; i++) {
@@ -208,6 +221,8 @@ uint64_t page_index_to_page_local_offset(uint64_t byte_offset, uint64_t page_ind
 
 void *func_cache_get_single_region_item_warmup(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
+    pinThreadToCore((int)it->tid);
+
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
 
@@ -276,6 +291,8 @@ void *func_cache_get_single_region_item_warmup(void *arg) {
 
 void *func_blocking_cache_get_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
+    pinThreadToCore((int)it->tid);
+
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
 
@@ -355,6 +372,8 @@ typedef struct PostProcessInfo {
 
 void *func_non_blocking_cache_get_single_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
+    pinThreadToCore((int)it->tid);
+
     uint64_t byte_index = 0, start_byte_offset = 0, end_byte_offset = 0, 
              start_page_index = 0, end_page_index = 0, start_page_local_offset = 0;
 
@@ -436,6 +455,8 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
 
 void *func_blocking_put_multiple_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
+    pinThreadToCore((int)it->tid);
+
     uint64_t offset = 0, index = 0;
     uint64_t num_ios = gItemSize / gDataSize / numThreads;
     
@@ -460,6 +481,8 @@ void *func_blocking_put_multiple_region_item(void *arg) {
 
 void *func_blocking_get_multiple_region_item(void *arg) {
     ValueInfo *it = (ValueInfo *)arg;
+    pinThreadToCore((int)it->tid);
+
     uint64_t offset = 0, index = 0;
     uint64_t num_ios = gItemSize / gDataSize / numThreads;
 
@@ -501,6 +524,11 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
 
     EXPECT_NO_THROW(item = my_fam->fam_allocate(itemPrefix.c_str(), gItemSize, 0777, desc));
     EXPECT_NE((void *)NULL, item);
+
+    ctx = (fam_context **) malloc(sizeof(fam_context *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        ctx[i] = my_fam->fam_context_open();
+    }
 
     for (uint64_t i = 0; i < numThreads; i++) {
         items[i] = item;
@@ -588,6 +616,11 @@ TEST(FamPutGet, BlockingFamPutSingleRegionDataItem) {
     EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
     free(descs);
 
+    for (uint64_t i = 0; i < numThreads; i++) {
+        my_fam->fam_context_close(ctx[i]);
+    }
+    free(ctx);
+
     free(sum_probs);
     delete[] infos;
     free(threads);
@@ -623,6 +656,11 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
 
     EXPECT_NO_THROW(item = my_fam->fam_allocate(itemPrefix.c_str(), gItemSize, 0777, desc));
     EXPECT_NE((void *)NULL, item);
+
+    ctx = (fam_context **) malloc(sizeof(fam_context *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        ctx[i] = my_fam->fam_context_open();
+    }
 
     for (uint64_t i = 0; i < numThreads; i++) {
         items[i] = item;
@@ -743,6 +781,11 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
     free(descs);
 
+    for (uint64_t i = 0; i < numThreads; i++) {
+        my_fam->fam_context_close(ctx[i]);
+    }
+    free(ctx);
+
     free(sum_probs);
 #ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
@@ -783,6 +826,11 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
 
     EXPECT_NO_THROW(item = my_fam->fam_allocate(itemPrefix.c_str(), gItemSize, 0777, desc));
     EXPECT_NE((void *)NULL, item);
+
+    ctx = (fam_context **) malloc(sizeof(fam_context *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        ctx[i] = my_fam->fam_context_open();
+    }
 
     for (uint64_t i = 0; i < numThreads; i++) {
         items[i] = item;
@@ -902,6 +950,11 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     // Destroying the region
     EXPECT_NO_THROW(my_fam->fam_destroy_region(desc));
     free(descs);
+
+    for (uint64_t i = 0; i < numThreads; i++) {
+        my_fam->fam_context_close(ctx[i]);
+    }
+    free(ctx);
 
     free(sum_probs);
 #ifdef ENABLE_LOCAL_CACHE
@@ -1205,6 +1258,7 @@ int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
 
 #ifdef ENABLE_LOCAL_CACHE
+    printf("ENABLE_LOCAL_CACHE\n");
     if (argc == 7) {
         gDataSize = atoi(argv[1]);
         isRand = atoi(argv[2]);
@@ -1215,13 +1269,20 @@ int main(int argc, char **argv) {
         if (cache_page_size == 0) {
             cache_page_size = gDataSize;
         }
+    } else {
+        fprintf(stderr, "# required parameters doesn't match\n");
+        exit(-1);
     }
 #else
+    printf("DISABLE_LOCAL_CACHE\n");
     if (argc == 5) {
         gDataSize = atoi(argv[1]);
         isRand = atoi(argv[2]);
         zipf = std::stod(argv[3]);
         numThreads = atoi(argv[4]);
+    } else {
+        fprintf(stderr, "# required parameters doesn't match\n");
+        exit(-1);
     }
 #endif
 
@@ -1268,25 +1329,20 @@ int main(int argc, char **argv) {
     memset(gCacheBuf, 1, gItemSize);
 #endif
 
+#ifndef ENABLE_LOCAL_CACHE
     fam_opts.local_buf_addr = gLocalBuf;
     fam_opts.local_buf_size = LOCAL_BUFFER_SIZE * numThreads;
+#else
+    fam_opts.local_buf_addr = gCacheBuf;
+    fam_opts.local_buf_size = gItemSize;
+#endif
 
     fam_opts.famThreadModel = strdup("FAM_THREAD_MULTIPLE");
 
     EXPECT_NO_THROW(my_fam->fam_initialize("default", &fam_opts));
     EXPECT_NO_THROW(myPE = (int *)my_fam->fam_get_option(strdup("PE_ID")));
 
-    ctx = (fam_context **) malloc(sizeof(fam_context *) * numThreads);
-    for (uint64_t i = 0; i < numThreads; i++) {
-        ctx[i] = my_fam->fam_context_open();
-    }
-
     ret = RUN_ALL_TESTS();
-
-    for (uint64_t i = 0; i < numThreads; i++) {
-        my_fam->fam_context_close(ctx[i]);
-    }
-    free(ctx);
 
     cout << "finished all testing" << endl;
     EXPECT_NO_THROW(my_fam->fam_finalize("default"));
