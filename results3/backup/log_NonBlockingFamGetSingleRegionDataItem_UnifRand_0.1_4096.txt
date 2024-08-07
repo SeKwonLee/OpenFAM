@@ -1,0 +1,2300 @@
+NonBlockingFamGetSingleRegionDataItem UnifRand 1 0.1
+ENABLE_LOCAL_CACHE
+gDataSize = 64
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 1091897221 us
+Elapsed time (ms): 1091897 ms
+Elapsed time (sec): 1092 sec
+Throughput: 0.122922 Mops/sec
+Throughput: 0.007327 GB/sec
+Cache hit ratio = 9.849527 
+Cache hit count = 13219811
+Cache miss count = 120997917
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (2210236 ms)
+[----------] 1 test from FamPutGet (2210236 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (2210237 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 128
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 553444331 us
+Elapsed time (ms): 553444 ms
+Elapsed time (sec): 553 sec
+Throughput: 0.121257 Mops/sec
+Throughput: 0.014455 GB/sec
+Cache hit ratio = 9.706184 
+Cache hit count = 6513710
+Cache miss count = 60595154
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (1165235 ms)
+[----------] 1 test from FamPutGet (1165235 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (1165235 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 256
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 274904634 us
+Elapsed time (ms): 274905 ms
+Elapsed time (sec): 275 sec
+Throughput: 0.122058 Mops/sec
+Throughput: 0.029101 GB/sec
+Cache hit ratio = 9.399432 
+Cache hit count = 3153926
+Cache miss count = 30400506
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (566302 ms)
+[----------] 1 test from FamPutGet (566302 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (566302 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 512
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 139619889 us
+Elapsed time (ms): 139620 ms
+Elapsed time (sec): 140 sec
+Throughput: 0.120164 Mops/sec
+Throughput: 0.057298 GB/sec
+Cache hit ratio = 8.810711 
+Cache hit count = 1478192
+Cache miss count = 15299024
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (296926 ms)
+[----------] 1 test from FamPutGet (296926 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (296926 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1024
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 68536386 us
+Elapsed time (ms): 68536 ms
+Elapsed time (sec): 69 sec
+Throughput: 0.122396 Mops/sec
+Throughput: 0.116726 GB/sec
+Cache hit ratio = 7.627964 
+Cache hit count = 639880
+Cache miss count = 7748728
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (153541 ms)
+[----------] 1 test from FamPutGet (153541 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (153541 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2048
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 36325220 us
+Elapsed time (ms): 36325 ms
+Elapsed time (sec): 36 sec
+Throughput: 0.115465 Mops/sec
+Throughput: 0.220233 GB/sec
+Cache hit ratio = 5.268216 
+Cache hit count = 220965
+Cache miss count = 3973339
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (86319 ms)
+[----------] 1 test from FamPutGet (86319 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (86319 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 4096
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 18983926 us
+Elapsed time (ms): 18984 ms
+Elapsed time (sec): 19 sec
+Throughput: 0.110470 Mops/sec
+Throughput: 0.421409 GB/sec
+Cache hit ratio = 0.511026 
+Cache hit count = 10717
+Cache miss count = 2086435
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (51882 ms)
+[----------] 1 test from FamPutGet (51882 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (51883 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 8192
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 12548238 us
+Elapsed time (ms): 12548 ms
+Elapsed time (sec): 13 sec
+Throughput: 0.083564 Mops/sec
+Throughput: 0.637540 GB/sec
+Cache hit ratio = 1.041794 
+Cache hit count = 10924
+Cache miss count = 2086228
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (44824 ms)
+[----------] 1 test from FamPutGet (44824 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (44825 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 16384
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 8221951 us
+Elapsed time (ms): 8222 ms
+Elapsed time (sec): 8 sec
+Throughput: 0.063767 Mops/sec
+Throughput: 0.973005 GB/sec
+Cache hit ratio = 2.048302 
+Cache hit count = 10739
+Cache miss count = 2086413
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (38608 ms)
+[----------] 1 test from FamPutGet (38608 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (38608 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 32768
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 6821069 us
+Elapsed time (ms): 6821 ms
+Elapsed time (sec): 7 sec
+Throughput: 0.038432 Mops/sec
+Throughput: 1.172837 GB/sec
+Cache hit ratio = 4.205322 
+Cache hit count = 11024
+Cache miss count = 2086128
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (36518 ms)
+[----------] 1 test from FamPutGet (36518 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (36518 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 65536
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 13616709 us
+Elapsed time (ms): 13617 ms
+Elapsed time (sec): 14 sec
+Throughput: 0.009626 Mops/sec
+Throughput: 0.587513 GB/sec
+Cache hit ratio = 8.068848 
+Cache hit count = 10576
+Cache miss count = 2086576
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (42557 ms)
+[----------] 1 test from FamPutGet (42557 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (42558 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 131072
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 14956236 us
+Elapsed time (ms): 14956 ms
+Elapsed time (sec): 15 sec
+Throughput: 0.004382 Mops/sec
+Throughput: 0.534894 GB/sec
+Cache hit ratio = 16.796875 
+Cache hit count = 11008
+Cache miss count = 2086144
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (44580 ms)
+[----------] 1 test from FamPutGet (44580 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (44580 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 262144
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 10362717 us
+Elapsed time (ms): 10363 ms
+Elapsed time (sec): 10 sec
+Throughput: 0.003162 Mops/sec
+Throughput: 0.771998 GB/sec
+Cache hit ratio = 31.835938 
+Cache hit count = 10432
+Cache miss count = 2086720
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (40031 ms)
+[----------] 1 test from FamPutGet (40031 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (40032 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 524288
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 14183944 us
+Elapsed time (ms): 14184 ms
+Elapsed time (sec): 14 sec
+Throughput: 0.001155 Mops/sec
+Throughput: 0.564018 GB/sec
+Cache hit ratio = 75.781250 
+Cache hit count = 12416
+Cache miss count = 2084736
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (44028 ms)
+[----------] 1 test from FamPutGet (44028 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (44028 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1048576
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 14157944 us
+Elapsed time (ms): 14158 ms
+Elapsed time (sec): 14 sec
+Throughput: 0.000579 Mops/sec
+Throughput: 0.565054 GB/sec
+Cache hit ratio = 128.125000 
+Cache hit count = 10496
+Cache miss count = 2086656
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (44080 ms)
+[----------] 1 test from FamPutGet (44080 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (44080 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2097152
+isRand = 1
+zipf = 0
+numThreads = 1
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 10472545 us
+Elapsed time (ms): 10473 ms
+Elapsed time (sec): 10 sec
+Throughput: 0.000391 Mops/sec
+Throughput: 0.763902 GB/sec
+Cache hit ratio = 337.500000 
+Cache hit count = 13824
+Cache miss count = 2083328
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (40207 ms)
+[----------] 1 test from FamPutGet (40208 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (40208 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+NonBlockingFamGetSingleRegionDataItem UnifRand 2 0.1
+ENABLE_LOCAL_CACHE
+gDataSize = 64
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 565758061 us
+Elapsed time (ms): 565758 ms
+Elapsed time (sec): 566 sec
+Throughput: 0.237235 Mops/sec
+Throughput: 0.014140 GB/sec
+Cache hit ratio = 9.849603 
+Cache hit count = 13219913
+Cache miss count = 120997815
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (1224503 ms)
+[----------] 1 test from FamPutGet (1224503 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (1224503 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 128
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 283633210 us
+Elapsed time (ms): 283633 ms
+Elapsed time (sec): 284 sec
+Throughput: 0.236604 Mops/sec
+Throughput: 0.028205 GB/sec
+Cache hit ratio = 9.707206 
+Cache hit count = 6514396
+Cache miss count = 60594468
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (610728 ms)
+[----------] 1 test from FamPutGet (610728 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (610728 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 256
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 146549444 us
+Elapsed time (ms): 146549 ms
+Elapsed time (sec): 147 sec
+Throughput: 0.228963 Mops/sec
+Throughput: 0.054589 GB/sec
+Cache hit ratio = 9.409335 
+Cache hit count = 3157249
+Cache miss count = 30397183
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (318943 ms)
+[----------] 1 test from FamPutGet (318944 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (318944 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 512
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 75313468 us
+Elapsed time (ms): 75313 ms
+Elapsed time (sec): 75 sec
+Throughput: 0.222765 Mops/sec
+Throughput: 0.106223 GB/sec
+Cache hit ratio = 8.812672 
+Cache hit count = 1478521
+Cache miss count = 15298695
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (166934 ms)
+[----------] 1 test from FamPutGet (166934 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (166935 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1024
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 33943461 us
+Elapsed time (ms): 33943 ms
+Elapsed time (sec): 34 sec
+Throughput: 0.247135 Mops/sec
+Throughput: 0.235686 GB/sec
+Cache hit ratio = 7.627332 
+Cache hit count = 639827
+Cache miss count = 7748781
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (86621 ms)
+[----------] 1 test from FamPutGet (86621 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (86621 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2048
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 19464403 us
+Elapsed time (ms): 19464 ms
+Elapsed time (sec): 19 sec
+Throughput: 0.215486 Mops/sec
+Throughput: 0.411007 GB/sec
+Cache hit ratio = 5.236697 
+Cache hit count = 219643
+Cache miss count = 3974661
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (54908 ms)
+[----------] 1 test from FamPutGet (54908 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (54909 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 4096
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 9981162 us
+Elapsed time (ms): 9981 ms
+Elapsed time (sec): 10 sec
+Throughput: 0.210111 Mops/sec
+Throughput: 0.801510 GB/sec
+Cache hit ratio = 0.518084 
+Cache hit count = 10865
+Cache miss count = 2086287
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (36262 ms)
+[----------] 1 test from FamPutGet (36262 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (36262 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 8192
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 7377349 us
+Elapsed time (ms): 7377 ms
+Elapsed time (sec): 7 sec
+Throughput: 0.142135 Mops/sec
+Throughput: 1.084400 GB/sec
+Cache hit ratio = 1.026058 
+Cache hit count = 10759
+Cache miss count = 2086393
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (32303 ms)
+[----------] 1 test from FamPutGet (32303 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (32303 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 16384
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 6274958 us
+Elapsed time (ms): 6275 ms
+Elapsed time (sec): 6 sec
+Throughput: 0.083552 Mops/sec
+Throughput: 1.274909 GB/sec
+Cache hit ratio = 2.049255 
+Cache hit count = 10744
+Cache miss count = 2086408
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (30017 ms)
+[----------] 1 test from FamPutGet (30017 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (30017 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 32768
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4282751 us
+Elapsed time (ms): 4283 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.061209 Mops/sec
+Throughput: 1.867958 GB/sec
+Cache hit ratio = 4.141235 
+Cache hit count = 10856
+Cache miss count = 2086296
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (26747 ms)
+[----------] 1 test from FamPutGet (26747 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (26747 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 65536
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 7597328 us
+Elapsed time (ms): 7597 ms
+Elapsed time (sec): 8 sec
+Throughput: 0.017252 Mops/sec
+Throughput: 1.053002 GB/sec
+Cache hit ratio = 8.532715 
+Cache hit count = 11184
+Cache miss count = 2085968
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (30215 ms)
+[----------] 1 test from FamPutGet (30215 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (30215 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 131072
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 8297077 us
+Elapsed time (ms): 8297 ms
+Elapsed time (sec): 8 sec
+Throughput: 0.007899 Mops/sec
+Throughput: 0.964195 GB/sec
+Cache hit ratio = 16.688538 
+Cache hit count = 10937
+Cache miss count = 2086215
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (31746 ms)
+[----------] 1 test from FamPutGet (31746 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (31746 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 262144
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 7486792 us
+Elapsed time (ms): 7487 ms
+Elapsed time (sec): 7 sec
+Throughput: 0.004377 Mops/sec
+Throughput: 1.068548 GB/sec
+Cache hit ratio = 34.960938 
+Cache hit count = 11456
+Cache miss count = 2085696
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (30371 ms)
+[----------] 1 test from FamPutGet (30371 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (30372 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 524288
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 8307827 us
+Elapsed time (ms): 8308 ms
+Elapsed time (sec): 8 sec
+Throughput: 0.001972 Mops/sec
+Throughput: 0.962947 GB/sec
+Cache hit ratio = 63.281250 
+Cache hit count = 10368
+Cache miss count = 2086784
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (31163 ms)
+[----------] 1 test from FamPutGet (31163 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (31164 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1048576
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 8086553 us
+Elapsed time (ms): 8087 ms
+Elapsed time (sec): 8 sec
+Throughput: 0.001013 Mops/sec
+Throughput: 0.989297 GB/sec
+Cache hit ratio = 112.500000 
+Cache hit count = 9216
+Cache miss count = 2087936
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (30839 ms)
+[----------] 1 test from FamPutGet (30839 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (30839 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2097152
+isRand = 1
+zipf = 0
+numThreads = 2
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 6275966 us
+Elapsed time (ms): 6276 ms
+Elapsed time (sec): 6 sec
+Throughput: 0.000653 Mops/sec
+Throughput: 1.274704 GB/sec
+Cache hit ratio = 262.500000 
+Cache hit count = 10752
+Cache miss count = 2086400
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (28748 ms)
+[----------] 1 test from FamPutGet (28748 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (28748 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+NonBlockingFamGetSingleRegionDataItem UnifRand 4 0.1
+ENABLE_LOCAL_CACHE
+gDataSize = 64
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 271495970 us
+Elapsed time (ms): 271496 ms
+Elapsed time (sec): 271 sec
+Throughput: 0.494364 Mops/sec
+Throughput: 0.029466 GB/sec
+Cache hit ratio = 9.852470 
+Cache hit count = 13223762
+Cache miss count = 120993966
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (658095 ms)
+[----------] 1 test from FamPutGet (658095 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (658095 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 128
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 140856159 us
+Elapsed time (ms): 140856 ms
+Elapsed time (sec): 141 sec
+Throughput: 0.476435 Mops/sec
+Throughput: 0.056796 GB/sec
+Cache hit ratio = 9.706283 
+Cache hit count = 6513776
+Cache miss count = 60595088
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (328517 ms)
+[----------] 1 test from FamPutGet (328517 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (328517 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 256
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 74773929 us
+Elapsed time (ms): 74774 ms
+Elapsed time (sec): 75 sec
+Throughput: 0.448745 Mops/sec
+Throughput: 0.106989 GB/sec
+Cache hit ratio = 9.401760 
+Cache hit count = 3154707
+Cache miss count = 30399725
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (179206 ms)
+[----------] 1 test from FamPutGet (179207 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (179207 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 512
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 39122384 us
+Elapsed time (ms): 39122 ms
+Elapsed time (sec): 39 sec
+Throughput: 0.428839 Mops/sec
+Throughput: 0.204487 GB/sec
+Cache hit ratio = 8.816975 
+Cache hit count = 1479243
+Cache miss count = 15297973
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (98284 ms)
+[----------] 1 test from FamPutGet (98284 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (98285 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1024
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 19520837 us
+Elapsed time (ms): 19521 ms
+Elapsed time (sec): 20 sec
+Throughput: 0.429726 Mops/sec
+Throughput: 0.409818 GB/sec
+Cache hit ratio = 7.652485 
+Cache hit count = 641937
+Cache miss count = 7746671
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (56602 ms)
+[----------] 1 test from FamPutGet (56602 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (56602 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2048
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 10120942 us
+Elapsed time (ms): 10121 ms
+Elapsed time (sec): 10 sec
+Throughput: 0.414418 Mops/sec
+Throughput: 0.790440 GB/sec
+Cache hit ratio = 5.243397 
+Cache hit count = 219924
+Cache miss count = 3974380
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (35765 ms)
+[----------] 1 test from FamPutGet (35765 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (35765 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 4096
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 5323876 us
+Elapsed time (ms): 5324 ms
+Elapsed time (sec): 5 sec
+Throughput: 0.393915 Mops/sec
+Throughput: 1.502665 GB/sec
+Cache hit ratio = 0.517416 
+Cache hit count = 10851
+Cache miss count = 2086301
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (24639 ms)
+[----------] 1 test from FamPutGet (24639 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (24639 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 8192
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4316742 us
+Elapsed time (ms): 4317 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.242909 Mops/sec
+Throughput: 1.853250 GB/sec
+Cache hit ratio = 1.033401 
+Cache hit count = 10836
+Cache miss count = 2086316
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (22971 ms)
+[----------] 1 test from FamPutGet (22971 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (22971 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 16384
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3244311 us
+Elapsed time (ms): 3244 ms
+Elapsed time (sec): 3 sec
+Throughput: 0.161602 Mops/sec
+Throughput: 2.465855 GB/sec
+Cache hit ratio = 2.016449 
+Cache hit count = 10572
+Cache miss count = 2086580
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (21684 ms)
+[----------] 1 test from FamPutGet (21684 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (21685 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 32768
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3843611 us
+Elapsed time (ms): 3844 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.068203 Mops/sec
+Throughput: 2.081376 GB/sec
+Cache hit ratio = 4.017639 
+Cache hit count = 10532
+Cache miss count = 2086620
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (21792 ms)
+[----------] 1 test from FamPutGet (21792 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (21792 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 65536
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4191193 us
+Elapsed time (ms): 4191 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.031273 Mops/sec
+Throughput: 1.908764 GB/sec
+Cache hit ratio = 8.346558 
+Cache hit count = 10940
+Cache miss count = 2086212
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (21603 ms)
+[----------] 1 test from FamPutGet (21603 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (21603 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 131072
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4938435 us
+Elapsed time (ms): 4938 ms
+Elapsed time (sec): 5 sec
+Throughput: 0.013271 Mops/sec
+Throughput: 1.619946 GB/sec
+Cache hit ratio = 16.699219 
+Cache hit count = 10944
+Cache miss count = 2086208
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (22934 ms)
+[----------] 1 test from FamPutGet (22934 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (22934 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 262144
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4884939 us
+Elapsed time (ms): 4885 ms
+Elapsed time (sec): 5 sec
+Throughput: 0.006708 Mops/sec
+Throughput: 1.637687 GB/sec
+Cache hit ratio = 34.765625 
+Cache hit count = 11392
+Cache miss count = 2085760
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (22618 ms)
+[----------] 1 test from FamPutGet (22618 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (22618 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 524288
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4517053 us
+Elapsed time (ms): 4517 ms
+Elapsed time (sec): 5 sec
+Throughput: 0.003627 Mops/sec
+Throughput: 1.771066 GB/sec
+Cache hit ratio = 58.593750 
+Cache hit count = 9600
+Cache miss count = 2087552
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (21835 ms)
+[----------] 1 test from FamPutGet (21835 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (21836 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1048576
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4427192 us
+Elapsed time (ms): 4427 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.001850 Mops/sec
+Throughput: 1.807014 GB/sec
+Cache hit ratio = 150.000000 
+Cache hit count = 12288
+Cache miss count = 2084864
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (21524 ms)
+[----------] 1 test from FamPutGet (21524 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (21524 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2097152
+isRand = 1
+zipf = 0
+numThreads = 4
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4954459 us
+Elapsed time (ms): 4954 ms
+Elapsed time (sec): 5 sec
+Throughput: 0.000827 Mops/sec
+Throughput: 1.614707 GB/sec
+Cache hit ratio = 217.480469 
+Cache hit count = 8908
+Cache miss count = 2088244
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (22944 ms)
+[----------] 1 test from FamPutGet (22944 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (22945 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+NonBlockingFamGetSingleRegionDataItem UnifRand 8 0.1
+ENABLE_LOCAL_CACHE
+gDataSize = 64
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 179823908 us
+Elapsed time (ms): 179824 ms
+Elapsed time (sec): 180 sec
+Throughput: 0.746384 Mops/sec
+Throughput: 0.044488 GB/sec
+Cache hit ratio = 9.851450 
+Cache hit count = 13222393
+Cache miss count = 120995335
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (458774 ms)
+[----------] 1 test from FamPutGet (458774 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (458775 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 128
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 89411224 us
+Elapsed time (ms): 89411 ms
+Elapsed time (sec): 89 sec
+Throughput: 0.750564 Mops/sec
+Throughput: 0.089474 GB/sec
+Cache hit ratio = 9.706376 
+Cache hit count = 6513839
+Cache miss count = 60595025
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (230746 ms)
+[----------] 1 test from FamPutGet (230747 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (230748 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 256
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 44089819 us
+Elapsed time (ms): 44090 ms
+Elapsed time (sec): 44 sec
+Throughput: 0.761047 Mops/sec
+Throughput: 0.181448 GB/sec
+Cache hit ratio = 9.411755 
+Cache hit count = 3158061
+Cache miss count = 30396371
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (117982 ms)
+[----------] 1 test from FamPutGet (117982 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (117982 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 512
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 23033777 us
+Elapsed time (ms): 23034 ms
+Elapsed time (sec): 23 sec
+Throughput: 0.728375 Mops/sec
+Throughput: 0.347316 GB/sec
+Cache hit ratio = 8.822644 
+Cache hit count = 1480194
+Cache miss count = 15297022
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (67810 ms)
+[----------] 1 test from FamPutGet (67810 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (67811 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1024
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 12862822 us
+Elapsed time (ms): 12863 ms
+Elapsed time (sec): 13 sec
+Throughput: 0.652159 Mops/sec
+Throughput: 0.621948 GB/sec
+Cache hit ratio = 7.636571 
+Cache hit count = 640602
+Cache miss count = 7748006
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (41481 ms)
+[----------] 1 test from FamPutGet (41481 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (41481 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2048
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 6349828 us
+Elapsed time (ms): 6350 ms
+Elapsed time (sec): 6 sec
+Throughput: 0.660538 Mops/sec
+Throughput: 1.259877 GB/sec
+Cache hit ratio = 5.253649 
+Cache hit count = 220354
+Cache miss count = 3973950
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (26927 ms)
+[----------] 1 test from FamPutGet (26927 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (26927 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 4096
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3427259 us
+Elapsed time (ms): 3427 ms
+Elapsed time (sec): 3 sec
+Throughput: 0.611904 Mops/sec
+Throughput: 2.334227 GB/sec
+Cache hit ratio = 0.513506 
+Cache hit count = 10769
+Cache miss count = 2086383
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (20466 ms)
+[----------] 1 test from FamPutGet (20466 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (20467 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 8192
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3067544 us
+Elapsed time (ms): 3068 ms
+Elapsed time (sec): 3 sec
+Throughput: 0.341829 Mops/sec
+Throughput: 2.607950 GB/sec
+Cache hit ratio = 1.029968 
+Cache hit count = 10800
+Cache miss count = 2086352
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19742 ms)
+[----------] 1 test from FamPutGet (19742 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19742 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 16384
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 2987787 us
+Elapsed time (ms): 2988 ms
+Elapsed time (sec): 3 sec
+Throughput: 0.175477 Mops/sec
+Throughput: 2.677567 GB/sec
+Cache hit ratio = 2.145004 
+Cache hit count = 11246
+Cache miss count = 2085906
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19338 ms)
+[----------] 1 test from FamPutGet (19338 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19338 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 32768
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3616507 us
+Elapsed time (ms): 3617 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.072485 Mops/sec
+Throughput: 2.212079 GB/sec
+Cache hit ratio = 4.048920 
+Cache hit count = 10614
+Cache miss count = 2086538
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19904 ms)
+[----------] 1 test from FamPutGet (19904 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19904 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 65536
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3548032 us
+Elapsed time (ms): 3548 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.036942 Mops/sec
+Throughput: 2.254771 GB/sec
+Cache hit ratio = 8.728027 
+Cache hit count = 11440
+Cache miss count = 2085712
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19611 ms)
+[----------] 1 test from FamPutGet (19611 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19611 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 131072
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3651585 us
+Elapsed time (ms): 3652 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.017947 Mops/sec
+Throughput: 2.190829 GB/sec
+Cache hit ratio = 15.682983 
+Cache hit count = 10278
+Cache miss count = 2086874
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19712 ms)
+[----------] 1 test from FamPutGet (19712 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19712 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 262144
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3734405 us
+Elapsed time (ms): 3734 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.008775 Mops/sec
+Throughput: 2.142242 GB/sec
+Cache hit ratio = 33.398438 
+Cache hit count = 10944
+Cache miss count = 2086208
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19967 ms)
+[----------] 1 test from FamPutGet (19968 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19969 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 524288
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3621814 us
+Elapsed time (ms): 3622 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.004524 Mops/sec
+Throughput: 2.208838 GB/sec
+Cache hit ratio = 59.375000 
+Cache hit count = 9728
+Cache miss count = 2087424
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19690 ms)
+[----------] 1 test from FamPutGet (19690 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19690 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 1048576
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3221716 us
+Elapsed time (ms): 3222 ms
+Elapsed time (sec): 3 sec
+Throughput: 0.002543 Mops/sec
+Throughput: 2.483149 GB/sec
+Cache hit ratio = 118.750000 
+Cache hit count = 9728
+Cache miss count = 2087424
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19345 ms)
+[----------] 1 test from FamPutGet (19345 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19345 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+----------------------------
+Details of OpenFAM Services:
+----------------------------
+Service             Id  Host          RPC Port
+----------------  ----  ----------  ----------
+memory service       0  10.1.34.32        8790
+metadata service     0  10.1.34.31        8881
+CIS                  0  10.1.34.31        8880
+ENABLE_LOCAL_CACHE
+gDataSize = 2097152
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.1
+cache_page_size = 4096
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 3784452 us
+Elapsed time (ms): 3784 ms
+Elapsed time (sec): 4 sec
+Throughput: 0.001082 Mops/sec
+Throughput: 2.113912 GB/sec
+Cache hit ratio = 242.480469 
+Cache hit count = 9932
+Cache miss count = 2087220
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (19408 ms)
+[----------] 1 test from FamPutGet (19408 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19408 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
