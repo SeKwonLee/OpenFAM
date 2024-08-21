@@ -969,6 +969,9 @@ if args.runtests:
         "numactl --membind=0 ./test/microbench/fam-api-mb/fam_microbenchmark_datapath2 {}".format(args.bench_args[0] + \
         " " + args.bench_args[1] + " " + args.bench_args[2] + " " + args.bench_args[3] + " " + args.bench_args[4] + " " + args.bench_args[5]) + " " + "{}".format(args.bench_args[6])
 
+    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + "gdb -ex=r --args ./test/unit-test/fam-api/fam_options_test"
+
     result = os.system(cmd)
 
 

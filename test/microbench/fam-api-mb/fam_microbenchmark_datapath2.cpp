@@ -198,6 +198,22 @@ void *func_blocking_get_single_region_item(void *arg) {
     pthread_exit(NULL);
 }
 
+void *func_non_blocking_get_single_region_item(void *arg) {
+    ValueInfo *it = (ValueInfo *)arg;
+    pinThreadToCore((int)it->tid);
+
+    uint64_t offset = 0;
+    void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
+
+    for (uint64_t i = 0; i < it->num_ops; i++) {
+        offset = it->indexes[i] * gDataSize;
+        ctx[it->tid]->fam_get_nonblocking(LocalBuf, it->item, offset, gDataSize);
+    }
+    ctx[it->tid]->fam_quiet();
+
+    pthread_exit(NULL);
+}
+
 #ifdef ENABLE_LOCAL_CACHE
 uint64_t offset_to_start_page_index(uint64_t byte_offset) {
     return (uint64_t)(byte_offset / cache_page_size);
@@ -320,7 +336,7 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
                 thread_local_page_start_addr = (uint64_t)it->cache_buf + (index * cache_page_size);
                 ctx[it->tid]->fam_get_blocking((void *)(thread_local_page_start_addr),
                         it->item, index * cache_page_size, cache_page_size);
-                it->cache->Put(index, (void *)(thread_local_page_start_addr));
+                //it->cache->Put(index, (void *)(thread_local_page_start_addr));
                 if (index == start_page_index) {
                     read_size = size_to_read > (cache_page_size - start_page_local_offset) ?
                         (cache_page_size - start_page_local_offset) : gDataSize;
@@ -429,7 +445,7 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
         if (PostProcessInfoArray.size() > 0) {
             ctx[it->tid]->fam_quiet();
             for (auto & info : PostProcessInfoArray) {
-                it->cache->Put(info.index, info.index_src);
+            //    it->cache->Put(info.index, info.index_src);
                 memcpy(info.dest, info.copy_src, info.read_size);
             }
             PostProcessInfoArray.clear();
@@ -762,7 +778,7 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         num_cache_hit += infos[i].num_cache_hit;
         num_cache_miss += infos[i].num_cache_miss;
     }
-    printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)num_ios) * 100.0);
+    printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)(num_cache_hit + num_cache_miss)) * 100.0);
     printf("Cache hit count = %lu\n", num_cache_hit);
     printf("Cache miss count = %lu\n", num_cache_miss);
 #endif
@@ -916,7 +932,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
 #else
     for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
-                        func_blocking_get_single_region_item, &infos[i]))) {
+                        func_non_blocking_get_single_region_item, &infos[i]))) {
             fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
             exit(1);
         }
@@ -939,7 +955,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
         num_cache_hit += infos[i].num_cache_hit;
         num_cache_miss += infos[i].num_cache_miss;
     }
-    printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)num_ios) * 100.0);
+    printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)(num_cache_hit + num_cache_miss)) * 100.0);
     printf("Cache hit count = %lu\n", num_cache_hit);
     printf("Cache miss count = %lu\n", num_cache_miss);
 #endif

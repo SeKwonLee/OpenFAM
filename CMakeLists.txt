@@ -93,7 +93,7 @@ endif()
 if(ENABLE_LOCAL_CACHE)
     message(STATUS "Enabling mok local cache implementation")
     add_definitions(-DENABLE_LOCAL_CACHE)
-    include_directories(/home/leesek/projects/caches/include)
+    include_directories(/home/leesek/projects/OpenFAM/third-party/caches/include)
 endif()
 
 message(STATUS "====================")
