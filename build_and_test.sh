@@ -19,7 +19,7 @@ export LD_LIBRARY_PATH=$THIRDPARTY_BUILD/lib/:$THIRDPARTY_BUILD/lib64/:$LD_LIBRA
 cd $BUILD_DIR
 
 #cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_CHECK_OFFSETS=1 -DENABLE_THALLIUM=1 -DLIBFABRIC_PATH=/usr/lib64 -DPMIX_PATH=/usr/lib64; $MAKE_CMD ; make install
-cmake .. -DENABLE_LOCAL_CACHE=ON; $MAKE_CMD ; make install
+cmake .. -DENABLE_LOCAL_CACHE=OFF; $MAKE_CMD ; make install
 #cmake ..; $MAKE_CMD ; make install
 if [[ $? > 0 ]]
 then
@@ -83,8 +83,7 @@ export OPENFAM_ROOT=$CONFIG_OUT_DIR
 
 ####### Caching page access
 ##for cache_page_size in 64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152
-#for cache_page_size in 4096 65536
-for cache_page_size in 65536
+for cache_page_size in 4096 65536
 do
     for op_type in BlockingFamGetSingleRegionDataItem NonBlockingFamGetSingleRegionDataItem
     do
@@ -94,7 +93,7 @@ do
             for num_threads in 1 2 4 8
             do
                 #for cache_ratio in 1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1
-                for cache_ratio in 0.9 0.5 0.1
+                for cache_ratio in 0.0
                 do
                     printf "${op_type} ${access_pattern} ${num_threads} ${cache_ratio}\n" &>> log_${op_type}_${access_pattern}_${cache_ratio}_${cache_page_size}.txt
                     for io_size in 64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152
@@ -151,7 +150,7 @@ do
         for num_threads in 1 2 4 8
         do
             #for cache_ratio in 1.0 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 0.1
-            for cache_ratio in 0.9 0.5 0.1
+            for cache_ratio in 0.0
             do
                 printf "${op_type} ${access_pattern} ${num_threads} ${cache_ratio}\n" &>> log_${op_type}_${access_pattern}_${cache_ratio}.txt
                 for io_size in 64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152
