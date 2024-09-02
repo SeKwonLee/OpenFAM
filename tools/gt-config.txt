@@ -1,0 +1,14 @@
+--model=memory_server
+--cisinterface=rpc
+--memserverinterface=rpc
+--metaserverinterface=rpc
+--metapath=/dev/shm/fam_metadata_sekwon
+--cisserver={rpc_interface:gtfama6,rpc_port:8787,launcher_options:"-p" "gtfamA" "numactl" "--cpunodebind=0" "--membind=0"}
+--memservers=0:{memory_type:volatile,fam_path:/var/lib/hugetlbfs/global/pagesize-2097152/vol1_sekwon,rpc_interface:gtfama7,rpc_port:8793,libfabric_port:7500,if_device:cxi0,launcher_options:"-p" "gtfamA" "numactl" "--cpunodebind=0" "--membind=0"}
+--metaservers=0:{rpc_interface:gtfama6,rpc_port:8788,launcher_options:"-p" "gtfamA" "numactl" "--cpunodebind=0" "--membind=0"}
+--sleep=10
+--provider=cxi
+--launcher=slurm
+--runtime=PMI2
+--rpc_framework=grpc
+--test_args={num_pes:1,launcher_options:"-p" "gtfamA" "--cpunodebind=0" "--membind=0" "--nodelist=gtfama6"}
