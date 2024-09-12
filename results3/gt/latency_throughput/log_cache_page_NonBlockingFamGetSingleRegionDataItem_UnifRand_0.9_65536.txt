@@ -1,0 +1,561 @@
+cache_page NonBlockingFamGetSingleRegionDataItem UnifRand 8 0.9
+ENABLE_LOCAL_CACHE
+gDataSize = 64
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 36901373 us
+Elapsed time (ms): 36901 ms
+Elapsed time (sec): 37 sec
+Throughput: 3.637201 Mops/sec
+Throughput: 0.216794 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 120791040
+Cache miss count = 13426688
+Average latency = 2059 ns
+Min latency = 50 ns
+Max latency = 275404 ns
+50th median latency = 200 ns
+90th tail latency = 6843 ns
+95th tail latency = 18444 ns
+99th tail latency = 24366 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (51613 ms)
+[----------] 1 test from FamPutGet (51613 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (51614 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 128
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 18467095 us
+Elapsed time (ms): 18467 ms
+Elapsed time (sec): 18 sec
+Throughput: 3.633970 Mops/sec
+Throughput: 0.433203 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 60395520
+Cache miss count = 6713344
+Average latency = 2062 ns
+Min latency = 40 ns
+Max latency = 191848 ns
+50th median latency = 210 ns
+90th tail latency = 6812 ns
+95th tail latency = 18394 ns
+99th tail latency = 24275 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (27325 ms)
+[----------] 1 test from FamPutGet (27325 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (27325 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 256
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 9217830 us
+Elapsed time (ms): 9218 ms
+Elapsed time (sec): 9 sec
+Throughput: 3.640166 Mops/sec
+Throughput: 0.867883 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 30197760
+Cache miss count = 3356672
+Average latency = 2065 ns
+Min latency = 40 ns
+Max latency = 192850 ns
+50th median latency = 221 ns
+90th tail latency = 6843 ns
+95th tail latency = 18294 ns
+99th tail latency = 24015 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (14961 ms)
+[----------] 1 test from FamPutGet (14961 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (14961 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 512
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 4607192 us
+Elapsed time (ms): 4607 ms
+Elapsed time (sec): 5 sec
+Throughput: 3.641527 Mops/sec
+Throughput: 1.736416 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 15098880
+Cache miss count = 1678336
+Average latency = 2071 ns
+Min latency = 50 ns
+Max latency = 229519 ns
+50th median latency = 251 ns
+90th tail latency = 6883 ns
+95th tail latency = 18094 ns
+99th tail latency = 23564 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (8955 ms)
+[----------] 1 test from FamPutGet (8955 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (8955 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 1024
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 2307385 us
+Elapsed time (ms): 2307 ms
+Elapsed time (sec): 2 sec
+Throughput: 3.635548 Mops/sec
+Throughput: 3.467128 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 7549440
+Cache miss count = 839168
+Average latency = 2083 ns
+Min latency = 60 ns
+Max latency = 216534 ns
+50th median latency = 301 ns
+90th tail latency = 6943 ns
+95th tail latency = 17823 ns
+99th tail latency = 23052 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (5934 ms)
+[----------] 1 test from FamPutGet (5934 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (5934 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 2048
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 1170476 us
+Elapsed time (ms): 1170 ms
+Elapsed time (sec): 1 sec
+Throughput: 3.583417 Mops/sec
+Throughput: 6.834826 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 3774720
+Cache miss count = 419584
+Average latency = 2130 ns
+Min latency = 71 ns
+Max latency = 190085 ns
+50th median latency = 521 ns
+90th tail latency = 7003 ns
+95th tail latency = 16370 ns
+99th tail latency = 21180 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (4501 ms)
+[----------] 1 test from FamPutGet (4501 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (4501 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 4096
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 638504 us
+Elapsed time (ms): 639 ms
+Elapsed time (sec): 1 sec
+Throughput: 3.284477 Mops/sec
+Throughput: 12.529287 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 1887360
+Cache miss count = 209792
+Average latency = 2344 ns
+Min latency = 251 ns
+Max latency = 227174 ns
+50th median latency = 1052 ns
+90th tail latency = 7514 ns
+95th tail latency = 13566 ns
+99th tail latency = 18655 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3810 ms)
+[----------] 1 test from FamPutGet (3810 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3810 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 8192
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 450970 us
+Elapsed time (ms): 451 ms
+Elapsed time (sec): 0 sec
+Throughput: 2.325157 Mops/sec
+Throughput: 17.739539 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 943680
+Cache miss count = 104896
+Average latency = 3274 ns
+Min latency = 391 ns
+Max latency = 322071 ns
+50th median latency = 1914 ns
+90th tail latency = 8095 ns
+95th tail latency = 14327 ns
+99th tail latency = 18866 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3557 ms)
+[----------] 1 test from FamPutGet (3557 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3557 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 16384
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 332598 us
+Elapsed time (ms): 333 ms
+Elapsed time (sec): 0 sec
+Throughput: 1.576341 Mops/sec
+Throughput: 24.053061 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 471840
+Cache miss count = 52448
+Average latency = 4818 ns
+Min latency = 661 ns
+Max latency = 423230 ns
+50th median latency = 3577 ns
+90th tail latency = 8796 ns
+95th tail latency = 15309 ns
+99th tail latency = 18986 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3438 ms)
+[----------] 1 test from FamPutGet (3438 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3438 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 32768
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 273138 us
+Elapsed time (ms): 273 ms
+Elapsed time (sec): 0 sec
+Throughput: 0.959749 Mops/sec
+Throughput: 29.289224 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 235920
+Cache miss count = 26224
+Average latency = 7917 ns
+Min latency = 1192 ns
+Max latency = 410606 ns
+50th median latency = 6803 ns
+90th tail latency = 12072 ns
+95th tail latency = 19005 ns
+99th tail latency = 23213 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3322 ms)
+[----------] 1 test from FamPutGet (3322 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3322 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 65536
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 242337 us
+Elapsed time (ms): 242 ms
+Elapsed time (sec): 0 sec
+Throughput: 0.540867 Mops/sec
+Throughput: 33.011880 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 117960
+Cache miss count = 13112
+Average latency = 14192 ns
+Min latency = 2304 ns
+Max latency = 419282 ns
+50th median latency = 13155 ns
+90th tail latency = 18033 ns
+95th tail latency = 27101 ns
+99th tail latency = 30818 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3280 ms)
+[----------] 1 test from FamPutGet (3280 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3280 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 131072
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 238322 us
+Elapsed time (ms): 238 ms
+Elapsed time (sec): 0 sec
+Throughput: 0.274989 Mops/sec
+Throughput: 33.568030 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 117960
+Cache miss count = 13112
+Average latency = 27767 ns
+Min latency = 4428 ns
+Max latency = 227013 ns
+50th median latency = 25949 ns
+90th tail latency = 39995 ns
+95th tail latency = 42480 ns
+99th tail latency = 46377 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3278 ms)
+[----------] 1 test from FamPutGet (3278 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3278 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 262144
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 237998 us
+Elapsed time (ms): 238 ms
+Elapsed time (sec): 0 sec
+Throughput: 0.137682 Mops/sec
+Throughput: 33.613728 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 117960
+Cache miss count = 13112
+Average latency = 55831 ns
+Min latency = 8716 ns
+Max latency = 265966 ns
+50th median latency = 53891 ns
+90th tail latency = 68979 ns
+95th tail latency = 71514 ns
+99th tail latency = 78526 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3273 ms)
+[----------] 1 test from FamPutGet (3273 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3273 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 524288
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 236496 us
+Elapsed time (ms): 236 ms
+Elapsed time (sec): 0 sec
+Throughput: 0.069278 Mops/sec
+Throughput: 33.827211 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 117960
+Cache miss count = 13112
+Average latency = 112145 ns
+Min latency = 18985 ns
+Max latency = 447124 ns
+50th median latency = 113872 ns
+90th tail latency = 124873 ns
+95th tail latency = 127618 ns
+99th tail latency = 134941 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3304 ms)
+[----------] 1 test from FamPutGet (3304 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3304 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 1048576
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 236558 us
+Elapsed time (ms): 237 ms
+Elapsed time (sec): 0 sec
+Throughput: 0.034630 Mops/sec
+Throughput: 33.818345 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 117960
+Cache miss count = 13112
+Average latency = 223649 ns
+Min latency = 35637 ns
+Max latency = 762823 ns
+50th median latency = 227634 ns
+90th tail latency = 242473 ns
+95th tail latency = 249716 ns
+99th tail latency = 276726 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3270 ms)
+[----------] 1 test from FamPutGet (3270 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3270 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0
+ENABLE_LOCAL_CACHE
+gDataSize = 2097152
+isRand = 1
+zipf = 0
+numThreads = 8
+cache_ratio = 0.9
+cache_page_size = 65536
+Note: Google Test filter = FamPutGet.NonBlockingFamGetSingleRegionDataItem
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from FamPutGet
+[ RUN      ] FamPutGet.NonBlockingFamGetSingleRegionDataItem
+Elapsed time (us): 238131 us
+Elapsed time (ms): 238 ms
+Elapsed time (sec): 0 sec
+Throughput: 0.017201 Mops/sec
+Throughput: 33.594954 GB/sec
+Cache hit ratio = 89.996338 
+Cache hit count = 117960
+Cache miss count = 13112
+Average latency = 452828 ns
+Min latency = 98133 ns
+Max latency = 1530406 ns
+50th median latency = 458465 ns
+90th tail latency = 478653 ns
+95th tail latency = 487970 ns
+99th tail latency = 569732 ns
+[       OK ] FamPutGet.NonBlockingFamGetSingleRegionDataItem (3281 ms)
+[----------] 1 test from FamPutGet (3281 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (3281 ms total)
+[  PASSED  ] 1 test.
+finished all testing
+Finalize done : 0

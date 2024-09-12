@@ -64,7 +64,7 @@ mode_t test_perm_mode;
 size_t test_item_size;
 
 int64_t *gLocalBuf = NULL;
-uint64_t gItemSize = 8192 * 1024 * 1024ULL;
+uint64_t gItemSize = 1 * 1024 * 1024 * 1024ULL;
 uint64_t gDataSize = 256;
 
 int isRand = 0;
@@ -83,6 +83,8 @@ template <typename Key, typename Value>
 using lru_cache_t = typename caches::fixed_sized_cache<Key, Value, caches::LRUCachePolicy>;
 double cache_ratio = 0.0;
 uint64_t cache_page_size = 4096;
+
+std::vector<std::vector<uint64_t>> op_latency_maps;
 
 struct ValueInfo {
     Fam_Descriptor *item;
@@ -253,6 +255,9 @@ void *func_cache_get_single_region_item_warmup(void *arg) {
     uint64_t index, thread_local_page_start_addr;
     for (uint64_t i = 0; i < indexes.size(); i++) {
         index = indexes[i];
+#ifdef ENABLE_FULL_CACHE_MISS_SIMULATION
+        index += (gItemSize / cache_page_size);
+#endif
         thread_local_page_start_addr = (uint64_t)it->cache_buf + (index * cache_page_size);
         it->cache->Put(index, (void *)(thread_local_page_start_addr));
     }
@@ -270,6 +275,9 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
     void *LocalBuf = (void *)((uint64_t)gLocalBuf + (it->tid * LOCAL_BUFFER_SIZE));
 
     for (uint64_t i = 0; i < it->num_ops; i++) {
+#ifdef ENABLE_LATENCY_CHECK
+        auto op_start = std::chrono::system_clock::now();
+#endif
         byte_index = it->indexes[i];
 
         start_byte_offset = byte_index * gDataSize;
@@ -328,6 +336,11 @@ void *func_blocking_cache_get_single_region_item(void *arg) {
 #endif
             size_to_read -= read_size;
         }
+#ifdef ENABLE_LATENCY_CHECK
+        auto op_end = std::chrono::system_clock::now();
+        uint64_t op_elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(op_end - op_start).count();
+        op_latency_maps[it->tid].push_back(op_elapsed_time);
+#endif
     }
 
     pthread_exit(NULL);
@@ -358,6 +371,9 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
     }
 
     for (uint64_t i = 0; i < it->num_ops; i++) {
+#ifdef ENABLE_LATENCY_CHECK
+        auto op_start = std::chrono::system_clock::now();
+#endif
         byte_index = it->indexes[i];
 
         start_byte_offset = byte_index * gDataSize;
@@ -369,6 +385,7 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
         start_page_local_offset = page_index_to_page_local_offset(start_byte_offset, start_page_index);
 
         uint64_t size_to_read = gDataSize, read_size = 0, thread_local_page_start_addr = 0;
+        //if (i % 2 == 0) {
         for (uint64_t index = start_page_index; index <= end_page_index; index++) {
 #ifdef ENABLE_LOCAL_CACHE
             const auto cache_value = it->cache->TryGet(index);
@@ -437,6 +454,18 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
             }
             PostProcessInfoArray.clear();
         }
+
+        //} else {
+        //thread_local_page_start_addr = (uint64_t)it->cache_buf + start_byte_offset;
+        //ctx[it->tid]->fam_get_blocking((void *)(thread_local_page_start_addr),
+        //    it->item, start_byte_offset, size_to_read);
+        //memcpy(LocalBuf, (void *)thread_local_page_start_addr, size_to_read);
+        //}
+#ifdef ENABLE_LATENCY_CHECK
+        auto op_end = std::chrono::system_clock::now();
+        uint64_t op_elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(op_end - op_start).count();
+        op_latency_maps[it->tid].push_back(op_elapsed_time);
+#endif
     }
 
     pthread_exit(NULL);
@@ -721,6 +750,13 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         infos[sample_index / (num_indexes / numThreads)].num_ops++;
     }
 
+#ifdef ENABLE_LATENCY_CHECK
+    for (uint64_t i = 0; i < numThreads; i++)
+        op_latency_maps.push_back(std::vector<uint64_t>());
+    for (uint64_t i = 0; i < numThreads; i++)
+        op_latency_maps[i].reserve(infos[i].num_ops);
+#endif
+
 #ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
@@ -763,6 +799,31 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
     printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)(num_cache_hit + num_cache_miss)) * 100.0);
     printf("Cache hit count = %lu\n", num_cache_hit);
     printf("Cache miss count = %lu\n", num_cache_miss);
+#endif
+
+#ifdef ENABLE_LATENCY_CHECK
+    std::vector<uint64_t> combined_latency_map;
+    combined_latency_map.reserve(num_ios);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        combined_latency_map.insert(combined_latency_map.end(), op_latency_maps[i].begin(), op_latency_maps[i].end());
+    }
+    std::sort(combined_latency_map.begin(), combined_latency_map.end());
+
+    uint64_t average_latency = std::accumulate(combined_latency_map.begin(), combined_latency_map.end(), 0UL) / num_ios;
+    uint64_t min_latency = combined_latency_map.front();
+    uint64_t max_latency = combined_latency_map.back();
+    uint64_t median_latency = combined_latency_map[trunc((double)combined_latency_map.size() * 0.50)];
+    uint64_t tail_latency_90 = combined_latency_map[trunc((double)combined_latency_map.size() * 0.90)];
+    uint64_t tail_latency_95 = combined_latency_map[trunc((double)combined_latency_map.size() * 0.95)];
+    uint64_t tail_latency_99 = combined_latency_map[trunc((double)combined_latency_map.size() * 0.99)];
+
+    printf("Average latency = %lu ns\n", average_latency);
+    printf("Min latency = %lu ns\n", min_latency);
+    printf("Max latency = %lu ns\n", max_latency);
+    printf("50th median latency = %lu ns\n", median_latency);                                         
+    printf("90th tail latency = %lu ns\n", tail_latency_90);                                          
+    printf("95th tail latency = %lu ns\n", tail_latency_95);                                          
+    printf("99th tail latency = %lu ns\n", tail_latency_99);
 #endif
 
     // Deallocating data items
@@ -894,6 +955,13 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
         infos[sample_index / (num_indexes / numThreads)].num_ops++;
     }
 
+#ifdef ENABLE_LATENCY_CHECK
+    for (uint64_t i = 0; i < numThreads; i++)
+        op_latency_maps.push_back(std::vector<uint64_t>());
+    for (uint64_t i = 0; i < numThreads; i++)
+        op_latency_maps[i].reserve(infos[i].num_ops);
+#endif
+
 #ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
@@ -936,6 +1004,31 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     printf("Cache hit ratio = %f \n", (double)((double)num_cache_hit / (double)(num_cache_hit + num_cache_miss)) * 100.0);
     printf("Cache hit count = %lu\n", num_cache_hit);
     printf("Cache miss count = %lu\n", num_cache_miss);
+#endif
+
+#ifdef ENABLE_LATENCY_CHECK
+    std::vector<uint64_t> combined_latency_map;
+    combined_latency_map.reserve(num_ios);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        combined_latency_map.insert(combined_latency_map.end(), op_latency_maps[i].begin(), op_latency_maps[i].end());
+    }
+    std::sort(combined_latency_map.begin(), combined_latency_map.end());
+
+    uint64_t average_latency = std::accumulate(combined_latency_map.begin(), combined_latency_map.end(), 0UL) / num_ios;
+    uint64_t min_latency = combined_latency_map.front();
+    uint64_t max_latency = combined_latency_map.back();
+    uint64_t median_latency = combined_latency_map[trunc((double)combined_latency_map.size() * 0.50)];
+    uint64_t tail_latency_90 = combined_latency_map[trunc((double)combined_latency_map.size() * 0.90)];
+    uint64_t tail_latency_95 = combined_latency_map[trunc((double)combined_latency_map.size() * 0.95)];
+    uint64_t tail_latency_99 = combined_latency_map[trunc((double)combined_latency_map.size() * 0.99)];
+
+    printf("Average latency = %lu ns\n", average_latency);
+    printf("Min latency = %lu ns\n", min_latency);
+    printf("Max latency = %lu ns\n", max_latency);
+    printf("50th median latency = %lu ns\n", median_latency);                                         
+    printf("90th tail latency = %lu ns\n", tail_latency_90);                                          
+    printf("95th tail latency = %lu ns\n", tail_latency_95);                                          
+    printf("99th tail latency = %lu ns\n", tail_latency_99);
 #endif
 
     // Deallocating data items

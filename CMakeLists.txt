@@ -91,9 +91,20 @@ if(ENABLE_RESOURCE_RELEASE_ITEM_PERM)
 endif()
 
 if(ENABLE_LOCAL_CACHE)
-    message(STATUS "Enabling mok local cache implementation")
-    add_definitions(-DENABLE_LOCAL_CACHE)
+        message(STATUS "Enabling mok local cache implementation")
+        add_definitions(-DENABLE_LOCAL_CACHE)
 endif()
+
+if(ENABLE_LATENCY_CHECK)
+        message(STATUS "Enabling latency check")
+        add_definitions(-DENABLE_LATENCY_CHECK)
+endif()
+
+if(ENABLE_FULL_CACHE_MISS_SIMULATION)
+        message(STATUS "Enabling full cache miss simulation")
+        add_definitions(-DENABLE_FULL_CACHE_MISS_SIMULATION)
+endif()
+
 include_directories(/home/leesek/projects/OpenFAM/third-party/caches/include)
 
 message(STATUS "====================")
@@ -108,7 +119,7 @@ set(CMAKE_CXX_FLAGS "-std=c++14 -pthread")
 set(CMAKE_CXX_FLAGS
         "${CMAKE_CXX_FLAGS} -Wall -W -Wextra -Wredundant-decls -Wunused -Wunused-macros -Wno-unused-parameter -Wcast-align -Wwrite-strings -Wmissing-field-initializers -Wendif-labels -Winit-self -Wlogical-op -Wpacked -Wstack-protector -Wformat=2 -Wswitch-enum -Wstrict-overflow=5 -Wpointer-arith -Wnormalized=nfc -Wno-long-long -Wconversion -Wunreachable-code")
 # Convert all warnings to errors
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 if(ENABLE_THALLIUM)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts-ts")
 endif()
