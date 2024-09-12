@@ -64,7 +64,7 @@ mode_t test_perm_mode;
 size_t test_item_size;
 
 int64_t *gLocalBuf = NULL;
-uint64_t gItemSize = 1 * 1024 * 1024 * 1024ULL;
+uint64_t gItemSize = 8 * 1024 * 1024 * 1024ULL;
 uint64_t gDataSize = 256;
 
 int isRand = 0;
