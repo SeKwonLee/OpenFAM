@@ -86,8 +86,8 @@ sleep 5
 #        done
 #    done
 #done
-
-
+#
+#
 ####### Direct byte access
 cache_type="direct_byte"
 #for op_type in BlockingFamGetSingleRegionDataItem NonBlockingFamGetSingleRegionDataItem
@@ -167,8 +167,7 @@ sleep 5
 ####### Caching page access
 cache_type="cache_page"
 ##for cache_page_size in 64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152
-#for cache_page_size in 4096 65536
-for cache_page_size in 65536
+for cache_page_size in 65536 4096
 do
     #for op_type in BlockingFamGetSingleRegionDataItem NonBlockingFamGetSingleRegionDataItem
     for op_type in NonBlockingFamGetSingleRegionDataItem
