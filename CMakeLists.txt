@@ -95,6 +95,11 @@ if(ENABLE_LOCAL_CACHE)
         add_definitions(-DENABLE_LOCAL_CACHE)
 endif()
 
+if(ENABLE_LOCAL_INDEX_FOR_DIRECT_ACCESS)
+        message(STATUS "Enabling local index for direct access")
+        add_definitions(-DENABLE_LOCAL_INDEX_FOR_DIRECT_ACCESS)
+endif()
+
 if(ENABLE_LATENCY_CHECK)
         message(STATUS "Enabling latency check")
         add_definitions(-DENABLE_LATENCY_CHECK)

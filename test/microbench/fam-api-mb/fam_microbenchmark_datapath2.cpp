@@ -83,6 +83,8 @@ void *gCacheBuf = NULL;
 
 template <typename Key, typename Value>
 using lru_cache_t = typename caches::fixed_sized_cache<Key, Value, caches::LRUCachePolicy>;
+template <typename Key, typename Value>
+using no_cache_t = typename caches::fixed_sized_cache<Key, Value, caches::NoCachePolicy>;
 double cache_ratio = 0.0;
 uint64_t cache_page_size = 4096;
 
@@ -93,7 +95,11 @@ struct ValueInfo {
     uint64_t tid;
     uint64_t num_ops;
     std::vector<uint64_t> indexes;
+#ifdef ENABLE_LOCAL_CACHE
     lru_cache_t<uint64_t, void *> *cache;
+#else
+    no_cache_t<uint64_t, uint64_t> *cache;
+#endif
     void *cache_buf;
     uint64_t num_cache_hit;
     uint64_t num_cache_miss;
@@ -160,7 +166,8 @@ int sample(int n, unsigned &seed, double base,
 void pinThreadToCore(int core_id) {
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
-	CPU_SET(core_id, &cpuset);
+	//CPU_SET(core_id, &cpuset);
+	CPU_SET(((core_id % 4) * 16) + (core_id / 4), &cpuset);
 
 	int result = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
 	if (result != 0) {
@@ -260,8 +267,14 @@ void *func_cache_get_single_region_item_warmup(void *arg) {
 #ifdef ENABLE_FULL_CACHE_MISS_SIMULATION
         index += (gItemSize / cache_page_size);
 #endif
+#ifdef ENABLE_LOCAL_CACHE
         thread_local_page_start_addr = (uint64_t)it->cache_buf + (index * cache_page_size);
         it->cache->Put(index, (void *)(thread_local_page_start_addr));
+#else
+#ifdef ENABLE_LOCAL_INDEX_FOR_DIRECT_ACCESS
+        it->cache->Put(index, page_index_to_page_offset(index));
+#endif
+#endif
     }
 
     pthread_exit(NULL);
@@ -382,6 +395,10 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
     uint64_t op_count = 0;
 #endif
 
+#ifdef ENABLE_HYBRID_TR_CACHE
+    uint64_t cache_ops_ratio = 50, num_cache_ops = 0, num_direct_ops = 0;
+#endif
+
     for (uint64_t i = 0; i < it->num_ops; i++) {
 #ifdef ENABLE_LATENCY_CHECK
         op_count++;
@@ -399,6 +416,9 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
         uint64_t size_to_read = gDataSize, read_size = 0;
         uint64_t thread_local_page_start_addr = 0, thread_local_buffer_addr = 0;
 #ifdef ENABLE_LOCAL_CACHE
+#ifdef ENABLE_HYBRID_TR_CACHE
+    if (i % 100 < cache_ops_ratio) {
+#endif
         for (uint64_t index = start_page_index; index <= end_page_index; index++) {
             const auto cache_value = it->cache->TryGet(index);
             cache_values.push_back(cache_value);
@@ -448,10 +468,25 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
                     //PostProcessInfoArray.push_back(ppi);
                     num_outstanding_ios++;
                     it->num_cache_miss++;
+
+#if 1
+                    if (num_outstanding_ios == max_num_outstanding_requests) {
+                        ctx[it->tid]->fam_quiet();
+                        num_outstanding_ios = 0;
+                    }
+#endif
                 }
                 size_to_read -= read_size;
             }
+#if 0
             num_outstanding_requests++;
+#else
+            if (num_outstanding_ios != 0) {
+                num_outstanding_requests = ((num_outstanding_requests + 1) % max_num_outstanding_requests);
+            } else {
+                num_outstanding_requests = 0;
+            }
+#endif
         } else {
             for (uint64_t index = start_page_index; index <= end_page_index; index++) {
                 thread_local_buffer_addr = (uint64_t)LocalBuf + ((index - start_page_index) * cache_page_size);
@@ -472,38 +507,82 @@ void *func_non_blocking_cache_get_single_region_item(void *arg) {
             }
         }
         cache_values.clear();
-#else
-        thread_local_buffer_addr = (uint64_t)LocalBuf + (((i % max_num_outstanding_requests) + 1) * LOCAL_BUFFER_SIZE);
+#ifdef ENABLE_HYBRID_TR_CACHE
+    } else {
+        thread_local_buffer_addr = (uint64_t)LocalBuf + ((num_outstanding_requests + 1) * LOCAL_BUFFER_SIZE);
         read_size = size_to_read;
 
         ctx[it->tid]->fam_get_nonblocking((void *)(thread_local_buffer_addr),
                 it->item, start_byte_offset, read_size);
         num_outstanding_ios++;
-        num_outstanding_requests++;
+        num_outstanding_requests++;       
+    }
+#endif
+#else
+        //thread_local_buffer_addr = (uint64_t)LocalBuf + (((i % max_num_outstanding_requests) + 1) * LOCAL_BUFFER_SIZE);
+        //read_size = size_to_read;
+
+        //ctx[it->tid]->fam_get_nonblocking((void *)(thread_local_buffer_addr),
+        //        it->item, start_byte_offset, read_size);
+        //num_outstanding_ios++;
+        //num_outstanding_requests++;
+
+        for (uint64_t index = start_page_index; index <= end_page_index; index++) {
+            thread_local_buffer_addr = (uint64_t)LocalBuf + ((num_outstanding_requests + 1) 
+                * LOCAL_BUFFER_SIZE) + ((index - start_page_index) * cache_page_size);
+
+#ifdef ENABLE_LOCAL_INDEX_FOR_DIRECT_ACCESS
+            const auto cache_value = it->cache->TryGet(index);
+            if (cache_value.second == true) {
+                ctx[it->tid]->fam_get_nonblocking((void *)(thread_local_buffer_addr),
+                        it->item, *cache_value.first, cache_page_size);
+            } else {
+                fprintf(stderr, "Cache miss that must not occur\n");
+                exit(0);
+            }
+#else
+            ctx[it->tid]->fam_get_nonblocking((void *)(thread_local_buffer_addr),
+                    it->item, page_index_to_page_offset(index), cache_page_size);
 #endif
 
-        if (num_outstanding_requests == max_num_outstanding_requests) {
-            if (num_outstanding_ios > 0) {
+            num_outstanding_ios++;
+            if (num_outstanding_ios == max_num_outstanding_requests) {
                 ctx[it->tid]->fam_quiet();
                 num_outstanding_ios = 0;
-//#ifdef ENABLE_LOCAL_CACHE
-//                for (auto &info : PostProcessInfoArray) {
-//                    it->cache->Put(info.index, info.index_src);
-//                    memcpy(info.dest, info.copy_src, info.read_size);
-//                }
-//                PostProcessInfoArray.clear();
-//#endif
             }
-            num_outstanding_requests = 0;
-
-#ifdef ENABLE_LATENCY_CHECK
-            op_end = std::chrono::system_clock::now();
-            op_elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(op_end - op_start).count();
-            op_latency_maps[it->tid].push_back(op_elapsed_time / op_count);
-            op_start = std::chrono::system_clock::now();
-            op_count = 0;
-#endif
+            
+            size_to_read -= cache_page_size;
         }
+
+        if (num_outstanding_ios != 0) {
+            num_outstanding_requests++;
+        } else {
+            num_outstanding_requests = 0;
+        }
+#endif
+
+//        if (num_outstanding_requests == max_num_outstanding_requests) {
+//            if (num_outstanding_ios > 0) {
+//                ctx[it->tid]->fam_quiet();
+//                num_outstanding_ios = 0;
+////#ifdef ENABLE_LOCAL_CACHE
+////                for (auto &info : PostProcessInfoArray) {
+////                    it->cache->Put(info.index, info.index_src);
+////                    memcpy(info.dest, info.copy_src, info.read_size);
+////                }
+////                PostProcessInfoArray.clear();
+////#endif
+//            }
+//            num_outstanding_requests = 0;
+//
+//#ifdef ENABLE_LATENCY_CHECK
+//            op_end = std::chrono::system_clock::now();
+//            op_elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(op_end - op_start).count();
+//            op_latency_maps[it->tid].push_back(op_elapsed_time / op_count);
+//            op_start = std::chrono::system_clock::now();
+//            op_count = 0;
+//#endif
+//        }
     }
 
     if (num_outstanding_ios > 0) {
@@ -724,11 +803,23 @@ TEST(FamPutGet, BlockingFamGetSingleRegionDataItem) {
         infos[i].num_cache_miss = 0;
     }
 #else
+#ifdef ENABLE_LOCAL_INDEX_FOR_DIRECT_ACCESS
+    size_t cache_size = (size_t)((double)(((double)gItemSize / (double)cache_page_size) / (double)numThreads) * 1.0);
+    no_cache_t<uint64_t, uint64_t> **caches = (no_cache_t<uint64_t, uint64_t> **)malloc(sizeof(no_cache_t<uint64_t, uint64_t> *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        caches[i] = new no_cache_t<uint64_t, uint64_t>(cache_size);
+        infos[i].cache = caches[i];
+        infos[i].cache_buf = gCacheBuf;
+        infos[i].num_cache_hit = 0;
+        infos[i].num_cache_miss = 0;
+    }
+#else
     for (uint64_t i = 0; i < numThreads; i++) {
         infos[i].cache_buf = gCacheBuf;
         infos[i].num_cache_hit = 0;
         infos[i].num_cache_miss = 0;
     }
+#endif
 #endif
 
     std::string regionPrefix("region");
@@ -929,11 +1020,23 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
         infos[i].num_cache_miss = 0;
     }
 #else
+#ifdef ENABLE_LOCAL_INDEX_FOR_DIRECT_ACCESS
+    size_t cache_size = (size_t)((double)(((double)gItemSize / (double)cache_page_size) / (double)numThreads) * 1.0);
+    no_cache_t<uint64_t, uint64_t> **caches = (no_cache_t<uint64_t, uint64_t> **)malloc(sizeof(no_cache_t<uint64_t, uint64_t> *) * numThreads);
+    for (uint64_t i = 0; i < numThreads; i++) {
+        caches[i] = new no_cache_t<uint64_t, uint64_t>(cache_size);
+        infos[i].cache = caches[i];
+        infos[i].cache_buf = gCacheBuf;
+        infos[i].num_cache_hit = 0;
+        infos[i].num_cache_miss = 0;
+    }
+#else
     for (uint64_t i = 0; i < numThreads; i++) {
         infos[i].cache_buf = gCacheBuf;
         infos[i].num_cache_hit = 0;
         infos[i].num_cache_miss = 0;
     }
+#endif
 #endif
 
     std::string regionPrefix("region");
@@ -1019,7 +1122,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
         op_latency_maps[i].reserve(infos[i].num_ops);
 #endif
 
-#ifdef ENABLE_LOCAL_CACHE
+//#ifdef ENABLE_LOCAL_CACHE
     for (uint64_t i = 0; i < numThreads; i++) {
         if ((rc = pthread_create(&threads[i], NULL, 
                         func_cache_get_single_region_item_warmup, &infos[i]))) {
@@ -1031,7 +1134,7 @@ TEST(FamPutGet, NonBlockingFamGetSingleRegionDataItem) {
     for (uint64_t i = 0; i < numThreads; i++) {
         pthread_join(threads[i], NULL);
     }
-#endif
+//#endif
 
     auto starttime = std::chrono::system_clock::now();
     for (uint64_t i = 0; i < numThreads; i++) {

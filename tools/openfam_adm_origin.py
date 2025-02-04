@@ -292,6 +292,13 @@ my_parser.add_argument(
     help="Disable the resource relinquishment in FAM",
 )
 
+my_parser.add_argument(
+    '--bench_args',
+    default=[],
+    type=lambda l:list(map(str, l.split(','))),
+    help="List of arguments for benchmarks"
+)
+
 args = my_parser.parse_args()
 
 # set error count and warning to 0
@@ -739,16 +746,25 @@ if args.start_service:
             memory_server_id = server.split(":")[0]
             memory_server_addr = server.split(":")[1]
             key_string="openfam:mem:"+server
-            if openfam_admin_tool_config_doc["launcher"] == "ssh":
+            #if openfam_admin_tool_config_doc["launcher"] == "ssh":
+            if True:
+                #cmd = (
+                #    ssh_cmd
+                #    + memory_server_addr
+                #    + " \"sh -c '"
+                #    + "nohup "
+                #    + openfam_install_path
+                #    + "/bin/memory_server -m "
+                #    + memory_server_id
+                #    + "> /dev/null 2>&1 &'\""
+                #)
                 cmd = (
                     ssh_cmd
                     + memory_server_addr
                     + " \"sh -c '"
                     + "nohup "
                     + openfam_install_path
-                    + "/bin/memory_server -m "
-                    + memory_server_id
-                    + "> /dev/null 2>&1 &'\""
+                    + "/../run_memory_server.sh'\""
                 )
             elif openfam_admin_tool_config_doc["launcher"] == "slurm":
                 command_options = openfam_admin_tool_config_doc["launcher_options"]["common"]
@@ -823,7 +839,8 @@ if args.start_service:
                 )
             else:
                 cmd = (
-                    openfam_install_path
+                    "numactl --cpunodebind=0 --membind=0 "
+                    + openfam_install_path
                     + "/bin/metadata_server -a "
                     + metadata_server_addr
                     + " -r "
@@ -873,7 +890,8 @@ if args.start_service:
             )
         else:
             cmd = (
-                openfam_install_path
+                "numactl --cpunodebind=0 --membind=0 "
+                + openfam_install_path
                 + "/bin/cis_server -a "
                 + cis_addr
                 + " -r "
@@ -921,21 +939,41 @@ if args.runtests:
             + str(npe)
         )
 
-    # Run regression and unit tests
-    cmd = "cd " + openfam_install_path + "; " + " make reg-test"
+    ## Run regression and unit tests
+    #cmd = "cd " + openfam_install_path + "; " + " make reg-test"
+    #result = os.system(cmd)
+    #if (result >> 8) != 0:
+    #    error_count = error_count + 1
+    #    print('\033[1;31;40mERROR['+str(error_count) +
+    #          ']: Regression test failed \033[0;37;40m')
+    #    sys.exit(1)
+    #cmd = "cd " + openfam_install_path + "; " + " make unit-test"
+    #result = os.system(cmd)
+    #if (result >> 8) != 0:
+    #    error_count = error_count + 1
+    #    print('\033[1;31;40mERROR['+str(error_count) +
+    #          ']: Unit test failed \033[0;37;40m')
+    #    sys.exit(1)
+
+    # w/o cache
+    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
+    #    "numactl --membind=0 ./test/microbench/fam-api-mb/fam_microbenchmark_datapath2 {}".format(args.bench_args[0] + \
+    #    " " + args.bench_args[1] + " " + args.bench_args[2] + " " + args.bench_args[3]) + " " + "{}".format(args.bench_args[4])
+
+    # numactl --membind=0
+    # gdb -ex=r --args
+    # with cache
+    cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+        " " + os.environ["OPENFAM_TEST_OPT"] + " " + \
+        "numactl --membind=0 ./test/microbench/fam-api-mb/fam_microbenchmark_datapath2 {}".format(args.bench_args[0] + \
+        " " + args.bench_args[1] + " " + args.bench_args[2] + " " + args.bench_args[3] + " " + args.bench_args[4] + " " + args.bench_args[5]) + " " + "{}".format(args.bench_args[6])
+
+    #cmd = "cd " + openfam_install_path + "; " + os.environ["OPENFAM_TEST_COMMAND"] + \
+    #    " " + os.environ["OPENFAM_TEST_OPT"] + " " + "gdb -ex=r --args ./test/unit-test/fam-api/fam_options_test"
+
     result = os.system(cmd)
-    if (result >> 8) != 0:
-        error_count = error_count + 1
-        print('\033[1;31;40mERROR['+str(error_count) +
-              ']: Regression test failed \033[0;37;40m')
-        sys.exit(1)
-    cmd = "cd " + openfam_install_path + "; " + " make unit-test"
-    result = os.system(cmd)
-    if (result >> 8) != 0:
-        error_count = error_count + 1
-        print('\033[1;31;40mERROR['+str(error_count) +
-              ']: Unit test failed \033[0;37;40m')
-        sys.exit(1)
+
 
 # Terminate all services
 if args.stop_service:
@@ -943,7 +981,8 @@ if args.stop_service:
         pe_config_doc["openfam_model"] == "memory_server"
         and cis_config_doc["memsrv_interface_type"] == "rpc"
     ):
-        if openfam_admin_tool_config_doc["launcher"] == "ssh":
+        #if openfam_admin_tool_config_doc["launcher"] == "ssh":
+        if True:
             for server in cis_config_doc["memsrv_list"]:
                 memory_server_addr = server.split(":")[1]
                 memory_server_rpc_port = server.split(":")[2]
@@ -1095,7 +1134,8 @@ if args.clean:
                         openfam_admin_tool_config_doc["launcher_options"]["memserver"][server]
                 cmd = "srun --nodelist=" + addr + " " + command_options + " rm -rf " + path
             else:
-                cmd = "rm -rf " + path
+                cmd = ssh_cmd + addr + " \"sh -c 'rm -rf " + path + "'\""
+                #cmd = "rm -rf " + path
             os.system(cmd)
 
     if(cis_config_doc["metadata_interface_type"] == "rpc"):
