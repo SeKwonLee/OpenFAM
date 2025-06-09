@@ -7,6 +7,12 @@ export OPENFAM_ROOT=$CONFIG_OUT_DIR
 
 #num_outstanding_reqs=16
 
+#creating build directory if not present
+if [ ! -d "$BUILD_DIR" ]; then
+  echo "Creating $BUILD_DIR"
+  mkdir -p $BUILD_DIR
+fi
+
 cd $BUILD_DIR
 
 cmake .. -DLIBFABRIC_PATH=/opt/cray/libfabric/1.15.2.0 -DENABLE_LOCAL_CACHE=OFF -DENABLE_LOCAL_INDEX_FOR_DIRECT_ACCESS=ON -DENABLE_LATENCY_CHECK=ON; make -j; make install
@@ -15,6 +21,8 @@ then
         echo "OpenFAM build with memoryserver version failed.. exit..."
         exit 1
 fi
+
+$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/gt-config.txt --create_config_files --config_file_path $CONFIG_OUT_DIR --install_path $INSTALL_DIR
 
 sleep 5
 
@@ -171,6 +179,8 @@ then
         echo "OpenFAM build with memoryserver version failed.. exit..."
         exit 1
 fi
+
+$BUILD_DIR/bin/openfam_adm @$TOOL_DIR/gt-config.txt --create_config_files --config_file_path $CONFIG_OUT_DIR --install_path $INSTALL_DIR
 
 sleep 5
 
